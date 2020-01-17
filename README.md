@@ -2,7 +2,7 @@
 Parametric mapping of MR lung perfusion and oxygen-enhanced imaging
 
 ## Data Preparation
-MAT-format "Pickle" files are created for each study.
+MAT-format "pickle" files are created for each study.
 
 In the folder ```Data-Pickles```, use the script ```pft_CreateDataPickles.m```.
 

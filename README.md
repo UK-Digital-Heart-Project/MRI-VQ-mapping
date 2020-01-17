@@ -18,4 +18,36 @@ Each pickle contains:
 ```This script was written using MATLAB 2017b, and may not work correctly with earlier versions.```
 
 ## Perfusion Mapping
+Perfusion maps are created from the initial "pickle" files.
+
+In the folder ```Perfusion-GUIDE-Project```, use the function ```pft_DceMriPerfusionGui.m```.
+
+This is documented with both a ```Quick User's Guide``` and a ```Short Checklist```.
+A more extended technical description will follow.
+
+The pixel-wise mapping is performed by deconvolving a measured ```Arterial Input Function``` from the local contrast ```time-course``` to yield a ```residue``` (impulse response) function. The following maps are created:
+
+- Pulmonary Blood Volume (PBV), with and without filtering (apodisation of the AIF and time-course).
+- Pulmonary Blood Flow (PBF), again, with and without filtering.
+- Time to Peak (TTP).
+- Mean Transit Time (MTT).
+
+The user is required to set:
+
+- The last usable frame (just before breath-holding fails).
+- A region of interest within the main pulmonary artery.
+- A number of deconvolution parameters.
+- A processing threshold.
+
+These decisions can be made during an initial, interactive phase of data review.
+The effect of changing the deconvolution parameters may be examined by freezing the time-course display at a given voxel.
+Conversely, the effect of applying a given set of parameters across the cine-stack is visible in an unfrozen display.
+
+The mapping outputs are:
+
+- A summary XL file with multiple tabs.
+- A PNG-format black-and-white image of the region-of-interest selected in the MPA.
+- A MAT-format pickle file conatining the 6 maps, plus the ROI.
+- A folder of the maps in DICOM format, organised into sub-folders. 
+
 

@@ -29,7 +29,7 @@ if isempty(SubFolders)
 end
 
 % Discard any remaining folders containing "MIP" or "SUB"
-Delete = contains(SubFolders, 'MIP') | contains(SubFolders, 'SUB');
+Delete = contains(SubFolders, 'MIP') | contains(SubFolders, 'SUB') | contains(SubFolders, 'SUB')
 SubFolders(Delete) = [];
 
 % Return if no sub-folders remain

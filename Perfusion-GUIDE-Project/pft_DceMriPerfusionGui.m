@@ -481,7 +481,7 @@ set(handles.DisplayEpochSlider, 'SliderStep', [1.0, 4.0]/double(handles.NEPOCHS 
 if (handles.Epoch > handles.NEPOCHS)
   handles.Epoch = handles.NEPOCHS; 
   set(handles.DisplayEpochSlider, 'Value', handles.NEPOCHS);
-  set(handles.DisplayEpochEdit, 'String', sprintf('  Epoch: %3d', handles.Slice));
+  set(handles.DisplayEpochEdit, 'String', sprintf('  Epoch: %3d', handles.Epoch));
 end
 
 % Update the Slice and Epoch edit windows and their corresponding sliders

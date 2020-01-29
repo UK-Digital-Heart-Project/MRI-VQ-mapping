@@ -46,6 +46,8 @@ CineStack = zeros([NROWS, NCOLS, NSLICES, NEPOCHS], Type);
 
 CineStack(:, :, :, 1) = Data;
 
+Path = fullfile(Root, SubFolders{NEPOCHS});
+
 Head = pft_ReadCommonWorkingHeader(Path);
 
 waitbar(double(1)/double(NEPOCHS), wb, sprintf('Read 1 of %1d sub-folders', NEPOCHS));
@@ -60,6 +62,26 @@ for e = 2:NEPOCHS
   
   waitbar(double(e)/double(NEPOCHS), wb, sprintf('Read %1d of %1d sub-folders', e, NEPOCHS));
 end
+
+delete(wb);
+
+% Re-sort the epochs by Acquisition Time
+wb = waitbar(0.5, 'Re-sorting epochs ...');
+
+ScreenSize = get(0, 'ScreenSize');
+HT = ScreenSize(4);
+OuterPosition = get(wb, 'OuterPosition');
+OuterPosition(2) = OuterPosition(2) + 0.05*HT;
+
+set(wb, 'OuterPosition', OuterPosition);
+
+[ AT, Order ] = sort(AT);
+
+CineStack = CineStack(:, :, :, Order);
+
+waitbar(1, wb, 'Re-sorting completed');
+
+pause(1.0);
 
 delete(wb);
 

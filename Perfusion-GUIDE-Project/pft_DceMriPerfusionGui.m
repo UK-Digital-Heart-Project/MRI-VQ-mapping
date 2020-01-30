@@ -399,13 +399,13 @@ handles.SLx2 = handles.ZOx2 + handles.DZx2*double(0:NP-1);
 
 [ NR, NC, NP, NE ] = size(handles.Mat.CineStackX4);
 
-handles.ZOx4 = handles.ZOx1 + 1.5*handles.DZx2;
+handles.ZOx4 = handles.ZOx1 + 1.5*handles.DZx1;
 handles.DZx4 = 4.0*handles.DZx1;
 handles.SLx4 = handles.ZOx4 + handles.DZx4*double(0:NP-1);
 
 [ NR, NC, NP, NE ] = size(handles.Mat.CineStackX8);
 
-handles.ZOx8 = handles.ZOx1 + 3.5*handles.DZx4;
+handles.ZOx8 = handles.ZOx1 + 3.5*handles.DZx1;
 handles.DZx8 = 8.0*handles.DZx1;
 handles.SLx8 = handles.ZOx8 + handles.DZx8*double(0:NP-1);
 

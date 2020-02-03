@@ -50,4 +50,23 @@ The mapping outputs are:
 - A MAT-format pickle file conatining the 6 maps, plus the ROI.
 - A folder of the maps in DICOM format, organised into sub-folders. 
 
+```This GUI was created using MATLAB 2015aSP1, and may not work correctly with earlier or later versions.```
+
+## Co-Registration
+Epochs later than one - up to the Last Usable Frame - are co-registered to the first using a free-form B-spline deformation.
+
+Each volume is first interpolated to isotropic voxels using ```imresize3```; the co-registration step is performed using ```imregdemons`` with default parameters, after which the co-registered volume is downsampled to the original resolution.
+
+Downsampled versions of the co-registered volumes (x2, x4, x8) are created using a "box" kernel, and saved with the full-resolution volumes.
+
+An array of Acquisition Times and a sample Dicom header are saved with the co-registered cine-stacks in a pickle file with the same format as the input; an extension of ```-MM-Spline-Coregistered``` is added to the filename.
+
+To co-register one data set, use the function ```pft_MultiModalCoregisterOnePickleFileInteractively.m```.
+
+The function ```pft_MultiModalCoregisterOnePickleFileAutomatically.m``` is also provided, and is straightforwardly scripted.
+
+```These functions were written using MATLAB 2017b; they should work correctly with later versions, but not with earlier ones.```
+
+
+
 

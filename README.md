@@ -65,7 +65,7 @@ To co-register one data set, use the function ```pft_MultiModalCoregisterOnePick
 
 The function ```pft_MultiModalCoregisterOnePickleFileAutomatically.m``` is also provided, and is straightforwardly scripted.
 
-```These functions were written using MATLAB 2017b; they should work correctly with later versions, but not with earlier ones.```
+```These functions were written using MATLAB 2017b; they should work correctly with later versions, but may not with earlier ones.```
 
 
 

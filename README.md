@@ -55,7 +55,7 @@ The mapping outputs are:
 ## Co-Registration
 Epochs later than one - up to the Last Usable Frame - are co-registered to the first using a free-form B-spline deformation.
 
-Each volume is first interpolated to isotropic voxels using ```imresize3```; the co-registration step is performed using ```imregdemons`` with default parameters, after which the co-registered volume is downsampled to the original resolution.
+Each volume is first interpolated to isotropic voxels using ```imresize3```; the co-registration step is performed using ```imregdemons``` with default parameters, after which the co-registered volume is downsampled to the original resolution.
 
 Downsampled versions of the co-registered volumes (x2, x4, x8) are created using a "box" kernel, and saved with the full-resolution volumes.
 

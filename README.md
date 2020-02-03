@@ -67,6 +67,18 @@ The function ```pft_MultiModalCoregisterOnePickleFileAutomatically.m``` is also 
 
 ```These functions were written using MATLAB 2017b; they should work correctly with later versions, but may not with earlier ones.```
 
+## Co-Registration-Review
+Since co-registration is a lengthy process, a single-dialog GUI has been created to allow comparisons between:
+
+- Epochs 1 and N of the original cine-stack.
+- Epochs 1 and N of the co-registered cine-stack.
+- Simultaneous epochs of the original and co-registered images.
+
+The active function here is ```pft_PerfusionCoregistrationReview.m```.
+
+Be sure to initialise the text files ```Source-Folder.txt``` and ```Target-Folder.txt```.
+
+```This MATLAB GUIDE application was created with MATLAB 2017b.```
 
 
 

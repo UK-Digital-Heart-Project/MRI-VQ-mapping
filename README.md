@@ -17,6 +17,34 @@ Each pickle contains:
 
 ```This script was written using MATLAB 2017b, and may not work correctly with earlier versions.```
 
+## Co-Registration
+Epochs later than one - up to the Last Usable Frame - are co-registered to the first using a free-form B-spline deformation.
+
+Each volume is first interpolated to isotropic voxels using ```imresize3```; the co-registration step is performed using ```imregdemons``` with default parameters, after which the co-registered volume is downsampled to the original resolution.
+
+Downsampled versions of the co-registered volumes (x2, x4, x8) are created using a "box" kernel, and saved with the full-resolution volumes.
+
+An array of Acquisition Times and a sample Dicom header are saved with the co-registered cine-stacks in a pickle file with the same format as the input; an extension of ```-MM-Spline-Coregistered``` is added to the filename.
+
+To co-register one data set, use the function ```pft_MultiModalCoregisterOnePickleFileInteractively.m```.
+
+The function ```pft_MultiModalCoregisterOnePickleFileAutomatically.m``` is also provided, and is straightforwardly scripted.
+
+```These functions were written using MATLAB 2017b; they should work correctly with later versions, but may not with earlier ones.```
+
+## Co-Registration-Review
+Since co-registration is a lengthy process, a single-dialog GUI has been created to allow comparisons between:
+
+- Epochs 1 and N of the original cine-stack.
+- Epochs 1 and N of the co-registered cine-stack.
+- Simultaneous epochs of the original and co-registered images.
+
+The active function here is ```pft_PerfusionCoregistrationReview.m```.
+
+Be sure to initialise the text files ```Source-Folder.txt``` and ```Target-Folder.txt```.
+
+```This MATLAB GUIDE application was created with MATLAB 2017b.```
+
 ## Perfusion Mapping
 Perfusion maps are created from the initial "pickle" files.
 
@@ -52,33 +80,23 @@ The mapping outputs are:
 
 ```This GUI was created using MATLAB 2015aSP1, and may not work correctly with earlier or later versions.```
 
-## Co-Registration
-Epochs later than one - up to the Last Usable Frame - are co-registered to the first using a free-form B-spline deformation.
+## Segmentation and Quantitation
+A simple GUI allows manual segmentation of the lungs from previously created perfusion maps.
 
-Each volume is first interpolated to isotropic voxels using ```imresize3```; the co-registration step is performed using ```imregdemons``` with default parameters, after which the co-registered volume is downsampled to the original resolution.
+Statitistics may then be saved to an XLSX file. The 7 tabs provide information on:
 
-Downsampled versions of the co-registered volumes (x2, x4, x8) are created using a "box" kernel, and saved with the full-resolution volumes.
+- Data dimensions and resolution.
+- Voxel counts and volumes in the segmented regions, including deficit fractions (volumes where no significant perfusion was observed).
+- PBV, including means, medians, standard deviations, minima and maxima.
+- PBF.
+- MTT.
+- TTP.
+- Data censorship.
 
-An array of Acquisition Times and a sample Dicom header are saved with the co-registered cine-stacks in a pickle file with the same format as the input; an extension of ```-MM-Spline-Coregistered``` is added to the filename.
+Results are grouped together for the right lung, left lung, and the combined region.
 
-To co-register one data set, use the function ```pft_MultiModalCoregisterOnePickleFileInteractively.m```.
+The interface is straightforward and the outputs are self-explanatory.
 
-The function ```pft_MultiModalCoregisterOnePickleFileAutomatically.m``` is also provided, and is straightforwardly scripted.
-
-```These functions were written using MATLAB 2017b; they should work correctly with later versions, but may not with earlier ones.```
-
-## Co-Registration-Review
-Since co-registration is a lengthy process, a single-dialog GUI has been created to allow comparisons between:
-
-- Epochs 1 and N of the original cine-stack.
-- Epochs 1 and N of the co-registered cine-stack.
-- Simultaneous epochs of the original and co-registered images.
-
-The active function here is ```pft_PerfusionCoregistrationReview.m```.
-
-Be sure to initialise the text files ```Source-Folder.txt``` and ```Target-Folder.txt```.
-
-```This MATLAB GUIDE application was created with MATLAB 2017b.```
 
 
 

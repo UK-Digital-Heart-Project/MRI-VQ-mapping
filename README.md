@@ -32,7 +32,7 @@ The function ```pft_MultiModalCoregisterOnePickleFileAutomatically.m``` is also 
 
 ```These functions were written using MATLAB 2017b; they should work correctly with later versions, but may not with earlier ones.```
 
-## Co-Registration-Review
+## Co-Registration Review
 Since co-registration is a lengthy process, a single-dialog GUI has been created to allow comparisons between:
 
 - Epochs 1 and N of the original cine-stack.

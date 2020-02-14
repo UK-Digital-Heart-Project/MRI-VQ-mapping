@@ -97,6 +97,8 @@ Results are grouped together for the right lung, left lung, and the combined reg
 
 The interface is straightforward and the outputs are self-explanatory.
 
+```This GUI was created using MATLAB 2015aSP1, and may not work correctly with earlier or later versions.```
+
 
 
 

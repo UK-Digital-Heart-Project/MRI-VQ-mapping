@@ -1630,6 +1630,8 @@ function DeleteRightLungROIButton_Callback(hObject, eventdata, handles)
 % Set the local slice-wise binary mask to false
 handles.RightBinaryMask(:, :, handles.Slice) = false;
 
+handles.TotalBinaryMask(:, :, handles.Slice) = handles.RightBinaryMask(:, :, handles.Slice) | handles.LinksBinaryMask(:, :, handles.Slice);
+
 % Update the display
 guidata(hObject, handles);
 handles = UpdateImageDisplay(handles);
@@ -1651,6 +1653,8 @@ function DeleteLeftLungROIButton_Callback(hObject, eventdata, handles)
 
 % Set the local slice-wise binary mask to false
 handles.LinksBinaryMask(:, :, handles.Slice) = false;
+
+handles.TotalBinaryMask(:, :, handles.Slice) = handles.LinksBinaryMask(:, :, handles.Slice) | handles.RightBinaryMask(:, :, handles.Slice);
 
 % Update the display
 guidata(hObject, handles);

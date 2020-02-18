@@ -970,11 +970,13 @@ Head = { 'Rows', 'Column', 'Planes', 'In-plane resolution / mm', 'Slice thicknes
 Data = {  NR,     NC,       NP,       DR,                         ST,                     DV             };
 Full = vertcat(Head, Data);
 
-xlswrite(XlsxFileName, Full, 'Reesolution');
+xlswrite(XlsxFileName, Full, 'Resolution');
 
 waitbar(double(1)/double(NTABS + 1), wb, sprintf('Saved 1 out of %1d tabs', NTABS));
 
 % Count the segmented voxels below threshold to obtain a "deficit fraction"
+handles.TotalBinaryMask = handles.RightBinaryMask | handles.LinksBinaryMask;
+
 RightSegmentedPixels = sum(handles.RightBinaryMask(:));
 RightSegmentedVolume = 0.001*double(RightSegmentedPixels)*DV;
 RightDisjunction     = handles.RightBinaryMask & ~handles.Mask;
@@ -1538,6 +1540,8 @@ delete(hp);
 
 handles.RightBinaryMask(:, :, handles.Slice) = logical(BW);
 
+handles.TotalBinaryMask(:, :, handles.Slice) = handles.RightBinaryMask(:, :, handles.Slice) | handles.LinksBinaryMask(:, :, handles.Slice);
+
 handles.RightPolygon = XY;
 
 % Re-enable most of the controls
@@ -1593,6 +1597,8 @@ XY = getPosition(hp);
 delete(hp);
 
 handles.LinksBinaryMask(:, :, handles.Slice) = logical(BW);
+
+handles.TotalBinaryMask(:, :, handles.Slice) = handles.LinksBinaryMask(:, :, handles.Slice) | handles.RightBinaryMask(:, :, handles.Slice);
 
 handles.LinksPolygon = XY;
 

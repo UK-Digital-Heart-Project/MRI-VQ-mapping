@@ -53,6 +53,9 @@ handles.ReuseLastROI = true;
 % Also, we have no DICOM header information for the quantitative o/p - this will be read in on entering Segmentation mode
 handles.Info = [];
 
+% Enable image labelling
+handles.LabelImages = true;
+
 % Centre the display
 ScreenSize = get(0, 'ScreenSize');
 FigureSize = get(hObject, 'Position');
@@ -411,9 +414,6 @@ guidata(hObject, handles);
 handles = UpdateImageDisplay(handles);
 guidata(hObject, handles);
 
-% Update the HANDLES structure
-guidata(hObject, handles);
-
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -442,9 +442,6 @@ handles.Maxi = handles.Lower + handles.Range*(handles.Ceiling/100.0);
 
 guidata(hObject, handles);
 handles = UpdateImageDisplay(handles);
-guidata(hObject, handles);
-
-% Update the HANDLES structure
 guidata(hObject, handles);
 
 end
@@ -482,9 +479,6 @@ guidata(hObject, handles);
 handles = UpdateImageDisplay(handles);
 guidata(hObject, handles);
 
-% Update the HANDLES structure
-guidata(hObject, handles);
-
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -513,9 +507,6 @@ handles.Maxi = handles.Lower + handles.Range*(handles.Ceiling/100.0);
 
 guidata(hObject, handles);
 handles = UpdateImageDisplay(handles);
-guidata(hObject, handles);
-
-% Update the HANDLES structure
 guidata(hObject, handles);
 
 end
@@ -607,9 +598,6 @@ guidata(hObject, handles);
 handles = UpdateImageDisplay(handles);
 guidata(hObject, handles);
 
-% Update the HANDLES structure
-guidata(hObject, handles);
-
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -628,9 +616,6 @@ set(handles.DisplaySliceEdit, 'String', sprintf('  Slice: %3d', handles.Slice));
 % Display the current slice
 guidata(hObject, handles);
 handles = UpdateImageDisplay(handles);
-guidata(hObject, handles);
-
-% Update the HANDLES structure
 guidata(hObject, handles);
 
 end
@@ -1341,9 +1326,6 @@ guidata(hObject, handles);
 handles = UpdateImageDisplay(handles);
 guidata(hObject, handles);
 
-% Update the HANDLES structure
-guidata(hObject, handles);
-
 end
   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1436,9 +1418,6 @@ handles.Maxi = handles.Lower + handles.Range*(handles.Ceiling/100.0);
 
 guidata(hObject, handles);
 handles = UpdateImageDisplay(handles);
-guidata(hObject, handles);
-
-% Update the HANDLES structure
 guidata(hObject, handles);
 
 end
@@ -1630,8 +1609,6 @@ function DeleteRightLungROIButton_Callback(hObject, eventdata, handles)
 % Set the local slice-wise binary mask to false
 handles.RightBinaryMask(:, :, handles.Slice) = false;
 
-handles.TotalBinaryMask(:, :, handles.Slice) = handles.RightBinaryMask(:, :, handles.Slice) | handles.LinksBinaryMask(:, :, handles.Slice);
-
 % Update the display
 guidata(hObject, handles);
 handles = UpdateImageDisplay(handles);
@@ -1653,8 +1630,6 @@ function DeleteLeftLungROIButton_Callback(hObject, eventdata, handles)
 
 % Set the local slice-wise binary mask to false
 handles.LinksBinaryMask(:, :, handles.Slice) = false;
-
-handles.TotalBinaryMask(:, :, handles.Slice) = handles.LinksBinaryMask(:, :, handles.Slice) | handles.RightBinaryMask(:, :, handles.Slice);
 
 % Update the display
 guidata(hObject, handles);
@@ -1711,6 +1686,7 @@ set(handles.ProcessingMaskRadio, 'Enable', 'off');
 
 set(handles.CensorHighValuesCheck, 'Enable', 'off');
 set(handles.CaptureDisplayButton, 'Enable', 'off');
+set(handles.LabelImagesCheck, 'Enable', 'off');
 
 % And finally, the segmentation controls themselves
 set(handles.ReuseLastROICheck, 'Enable', 'off');
@@ -1753,6 +1729,7 @@ set(handles.ProcessingMaskRadio, 'Enable', 'on');
 
 set(handles.CensorHighValuesCheck, 'Enable', 'on');
 set(handles.CaptureDisplayButton, 'Enable', 'on');
+set(handles.LabelImagesCheck, 'Enable', 'on');
 
 % And finally, the segmentation controls themselves
 set(handles.ReuseLastROICheck, 'Enable', 'on');
@@ -1842,9 +1819,11 @@ set(handles.ImageDisplayAxes, 'Position', handles.ImageDisplayAxesPosition);
 colormap(handles.ImageDisplayAxes, handles.Colormap);
 
 % Add a basic annotation to the image
-r = handles.Reduction;
-text(16.0/r, 16.0/r, handles.FileNameStub, 'Color', [1 1 0], 'FontName', 'FixedWidth', 'FontSize', 16, 'FontWeight', 'bold', 'Parent', handles.ImageDisplayAxes, 'Interpreter', 'none');
-text(16.0/r, 48.0/r, sprintf('Slice %3d', handles.Slice), 'Color', [1 1 0], 'FontName', 'FixedWidth', 'FontSize', 16, 'FontWeight', 'bold', 'Parent', handles.ImageDisplayAxes); 
+if (handles.LabelImages == true)
+  r = handles.Reduction;
+  text(16.0/r, 16.0/r, handles.FileNameStub, 'Color', [1 1 0], 'FontName', 'FixedWidth', 'FontSize', 16, 'FontWeight', 'bold', 'Parent', handles.ImageDisplayAxes, 'Interpreter', 'none');
+  text(16.0/r, 32.0/r, sprintf('Slice %3d', handles.Slice), 'Color', [1 1 0], 'FontName', 'FixedWidth', 'FontSize', 16, 'FontWeight', 'bold', 'Parent', handles.ImageDisplayAxes); 
+end
 
 % Return an updated HANDLES structure to the calling function
 guidata(handles.MainFigure, handles);
@@ -1915,6 +1894,26 @@ switch handles.ProgramState
     handles.TotalBinaryMask = handles.RightBinaryMask | handles.LinksBinaryMask;
     
 end    
+
+% Now update the image display
+guidata(hObject, handles);
+handles = UpdateImageDisplay(handles);
+guidata(hObject, handles);
+
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function LabelImagesCheck_Callback(hObject, eventdata, handles)
+
+% Decide whether to annotate images
+handles.LabelImages = get(hObject, 'Value');
+
+% Exit if there is nothing more to do
+if (handles.ReviewMapIsPresent == false)
+  guidata(hObject, handles);
+  return;
+end
 
 % Now update the image display
 guidata(hObject, handles);

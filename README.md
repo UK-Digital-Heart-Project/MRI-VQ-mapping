@@ -99,6 +99,10 @@ The interface is straightforward and the outputs are self-explanatory.
 
 ```This GUI was created using MATLAB 2015aSP1, and may not work correctly with earlier or later versions.```
 
+## Segmentation from Grayscale Images
+Segmentation using perfusion maps may be difficult in the presence of gross perfusion deficits.
+This GUI allows segmentation using the original grayscale cine-stacks.
 
+Quantitation using the manually drawn regions-of-interest and the previously calculated perfusion maps may then carried out using the separate Segmentation-Quantitation GUI.
 
 

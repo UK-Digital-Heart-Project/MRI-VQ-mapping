@@ -105,4 +105,4 @@ This GUI allows segmentation using the original grayscale cine-stacks.
 
 Quantitation using the manually drawn regions-of-interest and the previously calculated perfusion maps may then carried out using the separate Segmentation-Quantitation GUI.
 
-
+```This GUI was created using MATLAB 2015aSP1, and may not work correctly with earlier or later versions.```

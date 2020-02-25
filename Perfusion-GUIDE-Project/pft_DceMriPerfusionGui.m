@@ -1502,8 +1502,10 @@ end
 switch handles.Normalisation
   case 'AIF Peak'
     aif = handles.AIFPeak(2:handles.LastUsableFrame);
+    aif = double(aif);
   case 'AIF Mean'
     aif = handles.AIFMean(2:handles.LastUsableFrame);
+    aif = double(aif);
 end  
 
 aif = aif .* handles.Filter;
@@ -1859,8 +1861,10 @@ set(handles.PlotFullSolutionCheck, 'Enable', 'on');
 switch handles.Normalisation
   case 'AIF Peak'
     aif = handles.AIFPeak(2:handles.LastUsableFrame);
+    aif = double(aif);
   case 'AIF Mean'
     aif = handles.AIFMean(2:handles.LastUsableFrame);
+    aif = double(aif);
 end  
 
 aif = aif .* handles.Filter;
@@ -2146,8 +2150,10 @@ end
 switch handles.Normalisation
   case 'AIF Peak'
     aif = handles.AIFPeak(2:handles.LastUsableFrame);
+    aif = double(aif);
   case 'AIF Mean'
     aif = handles.AIFMean(2:handles.LastUsableFrame);
+    aif = double(aif);
 end  
 
 aif = aif .* handles.Filter;
@@ -2417,8 +2423,10 @@ end
 switch handles.Normalisation
   case 'AIF Peak'
     aif = handles.AIFPeak(2:handles.LastUsableFrame);
+    aif = double(aif);
   case 'AIF Mean'
     aif = handles.AIFMean(2:handles.LastUsableFrame);
+    aif = double(aif);
 end 
 
 aif = aif .* handles.Filter;
@@ -2788,8 +2796,10 @@ end
 switch handles.Normalisation
   case 'AIF Peak'
     aif = handles.AIFPeak(2:handles.LastUsableFrame);
+    aif = double(aif);
   case 'AIF Mean'
     aif = handles.AIFMean(2:handles.LastUsableFrame);
+    aif = double(aif);
 end  
 
 aif = aif .* handles.Filter;
@@ -3210,8 +3220,10 @@ end
 switch handles.Normalisation
   case 'AIF Peak'
     aif = handles.AIFPeak(2:handles.LastUsableFrame);
+    aif = double(aif);
   case 'AIF Mean'
     aif = handles.AIFMean(2:handles.LastUsableFrame);
+    aif = double(aif);
 end  
 
 % Set a threshold for the mapping
@@ -3319,14 +3331,17 @@ for s = 1:handles.NSLICES
     
   end
   
-  PBV = uint16(10000.0*PBV);                    % Units of 0.01 ml / 100 ml  
-  PBF = uint16(6000.0*PBF);                     % Units of ml / min / 100 ml  
+  PBV = uint16(10000.0*PBV);                        % Units of 0.01 ml / 100 ml  
+  PBF = uint16(6000.0*PBF);                         % Units of ml / min / 100 ml  
   
-  MTT(KeepMTT) = 1.0e4 + 1.0e3*MTT(KeepMTT);    % Offset true physical values (MTT = 0) from the unprocessed (below-threshold) background
-  MTT = uint16(MTT);                            % Units of 0.001 s - the unprocessed background is rendered as black
+  UnfilteredPBV = uint16(10000.0*UnfilteredPBV);    % Units of 0.01 ml / 100 ml  
+  UnfilteredPBF = uint16(6000.0*UnfilteredPBF);     % Units of ml / min / 100 ml  
+    
+  MTT(KeepMTT) = 1.0e4 + 1.0e3*MTT(KeepMTT);        % Offset true physical values (MTT = 0) from the unprocessed (below-threshold) background
+  MTT = uint16(MTT);                                % Units of 0.001 s - the unprocessed background is rendered as black
   
-  TTP(KeepTTP) = 1.0e4 + 1.0e3*TTP(KeepTTP);    % Offset true physical values (TTP = 0) from the unprocessed (below-threshold) background
-  TTP = uint16(TTP);                            % Units of 0.001 s - the unprocessed background is rendered as black
+  TTP(KeepTTP) = 1.0e4 + 1.0e3*TTP(KeepTTP);        % Offset true physical values (TTP = 0) from the unprocessed (below-threshold) background
+  TTP = uint16(TTP);                                % Units of 0.001 s - the unprocessed background is rendered as black
   
   AllPBV(:, :, s) = PBV;
   AllPBF(:, :, s) = PBF;
@@ -3576,8 +3591,10 @@ set(handles.hPlotSVCutoff, 'XData', [handles.SVCutoff, handles.SVCutoff]);
 switch handles.Normalisation
   case 'AIF Peak'
     aif = handles.AIFPeak(2:handles.LastUsableFrame);
+    aif = double(aif);
   case 'AIF Mean'
     aif = handles.AIFMean(2:handles.LastUsableFrame);
+    aif = double(aif);
 end  
 
 aif = aif .* handles.Filter;
@@ -3815,8 +3832,10 @@ set(handles.hPlotSVCutoff, 'XData', [handles.SVCutoff, handles.SVCutoff]);
 switch handles.Normalisation
   case 'AIF Peak'
     aif = handles.AIFPeak(2:handles.LastUsableFrame);
+    aif = double(aif);
   case 'AIF Mean'
     aif = handles.AIFMean(2:handles.LastUsableFrame);
+    aif = double(aif);
 end  
 
 aif = aif .* handles.Filter;
@@ -4069,8 +4088,10 @@ end
 switch handles.Normalisation
   case 'AIF Peak'
     aif = handles.AIFPeak(2:handles.LastUsableFrame);
+    aif = double(aif);
   case 'AIF Mean'
     aif = handles.AIFMean(2:handles.LastUsableFrame);
+    aif = double(aif);
 end  
 
 aif = aif .* handles.Filter;
@@ -4297,8 +4318,10 @@ end
 switch handles.Normalisation
   case 'AIF Peak'
     aif = handles.AIFPeak(2:handles.LastUsableFrame);
+    aif = double(aif);
   case 'AIF Mean'
     aif = handles.AIFMean(2:handles.LastUsableFrame);
+    aif = double(aif);
 end  
     
 aif = aif .* handles.Filter;
@@ -4525,8 +4548,10 @@ end
 switch handles.Normalisation
   case 'AIF Peak'
     aif = handles.AIFPeak(2:handles.LastUsableFrame);
+    aif = double(aif);
   case 'AIF Mean'
     aif = handles.AIFMean(2:handles.LastUsableFrame);
+    aif = double(aif);
 end  
 
 aif = aif .* handles.Filter;
@@ -5032,8 +5057,10 @@ end
 switch handles.Normalisation
   case 'AIF Peak'
     aif = handles.AIFPeak(2:handles.LastUsableFrame);
+    aif = double(aif);
   case 'AIF Mean'
     aif = handles.AIFMean(2:handles.LastUsableFrame);
+    aif = double(aif);
 end  
 
 aif = aif .* handles.Filter;
@@ -5297,8 +5324,10 @@ end
 switch handles.Normalisation
   case 'AIF Peak'
     aif = handles.AIFPeak(2:handles.LastUsableFrame);
+    aif = double(aif);
   case 'AIF Mean'
     aif = handles.AIFMean(2:handles.LastUsableFrame);
+    aif = double(aif);
 end  
 
 aif = aif .* handles.Filter;

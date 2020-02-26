@@ -940,7 +940,7 @@ XlsxFileName = fullfile(PathName, FileName);
 
 set(handles.XlsxSummaryFileEdit, 'String', sprintf('  XLSX Summary File:     %s', FileName));
 
-NTABS = 7;
+NTABS = 9;
 
 wb = waitbar(0, 'Saving statistics ...');
 
@@ -1052,6 +1052,58 @@ xlswrite(XlsxFileName, Full, 'PBV');
 
 waitbar(double(3)/double(NTABS + 1), wb, sprintf('Saved 3 out of %1d tabs', NTABS));
 
+% Calculate statistics for the unfiltered PBV
+Intercept = 0.0;
+Slope     = 0.01;
+
+pbv = Intercept + Slope*double(handles.UnfilteredPBV(RightOverlap));
+
+if (handles.CensorHighValues == true)
+  pbv(pbv > 100.0) = 100.0;
+end
+
+RightMu     = mean(pbv);
+RightMedian = median(pbv);
+RightSD     = std(pbv);
+RightMini   = min(pbv);
+RightMaxi   = max(pbv);
+
+pbv = Intercept + Slope*double(handles.UnfilteredPBV(LinksOverlap));
+
+if (handles.CensorHighValues == true)
+  pbv(pbv > 100.0) = 100.0;
+end
+
+LinksMu     = mean(pbv);
+LinksMedian = median(pbv);
+LinksSD     = std(pbv);
+LinksMini   = min(pbv);
+LinksMaxi   = max(pbv);
+
+pbv = Intercept + Slope*double(handles.UnfilteredPBV(TotalOverlap));
+
+if (handles.CensorHighValues == true)
+  pbv(pbv > 100.0) = 100.0;
+end
+
+TotalMu     = mean(pbv);
+TotalMedian = median(pbv);
+TotalSD     = std(pbv);
+TotalMini   = min(pbv);
+TotalMaxi   = max(pbv);
+
+Head = { 'Right mean unfiltered PBV / ml/(100 ml)', 'Median',     'S.D.',   'Minimum',  'Maximum', ...
+         'Left mean unfiltered PBV / ml/(100 ml)',  'Median',     'S.D.',   'Minimum',  'Maximum', ...
+         'Total mean unfiltered PBV / ml/(100 ml)', 'Median',     'S.D.',   'Minimum',  'Maximum' };
+Data = {  RightMu,                        RightMedian,  RightSD,  RightMini,  RightMaxi, ...
+          LinksMu,                        LinksMedian,  LinksSD,  LinksMini,  LinksMaxi, ...
+          TotalMu,                        TotalMedian,  TotalSD,  TotalMini,  TotalMaxi };
+Full = vertcat(Head, Data);
+
+xlswrite(XlsxFileName, Full, 'Unfiltered PBV');
+
+waitbar(double(4)/double(NTABS + 1), wb, sprintf('Saved 4 out of %1d tabs', NTABS));
+
 % Calculate statistics for the PBF
 Intercept = 0.0;
 Slope     = 1.0;
@@ -1102,7 +1154,59 @@ Full = vertcat(Head, Data);
 
 xlswrite(XlsxFileName, Full, 'PBF');
 
-waitbar(double(4)/double(NTABS + 1), wb, sprintf('Saved 4 out of %1d tabs', NTABS));
+waitbar(double(5)/double(NTABS + 1), wb, sprintf('Saved 5 out of %1d tabs', NTABS));
+
+% Calculate statistics for the unfiltered PBF
+Intercept = 0.0;
+Slope     = 1.0;
+
+pbf = Intercept + Slope*double(handles.UnfilteredPBF(RightOverlap));
+
+if (handles.CensorHighValues == true)
+  pbf(pbf > 6000.0) = 6000.0;
+end
+
+RightMu     = mean(pbf);
+RightMedian = median(pbf);
+RightSD     = std(pbf);
+RightMini   = min(pbf);
+RightMaxi   = max(pbf);
+
+pbf = Intercept + Slope*double(handles.UnfilteredPBF(LinksOverlap));
+
+if (handles.CensorHighValues == true)
+  pbf(pbf > 6000.0) = 6000.0;
+end
+
+LinksMu     = mean(pbf);
+LinksMedian = median(pbf);
+LinksSD     = std(pbf);
+LinksMini   = min(pbf);
+LinksMaxi   = max(pbf);
+
+pbf = Intercept + Slope*double(handles.UnfilteredPBF(TotalOverlap));
+
+if (handles.CensorHighValues == true)
+  pbf(pbf > 6000.0) = 6000.0;
+end
+
+TotalMu     = mean(pbf);
+TotalMedian = median(pbf);
+TotalSD     = std(pbf);
+TotalMini   = min(pbf);
+TotalMaxi   = max(pbf);
+
+Head = { 'Right mean unfiltered PBF / (ml/min)/(100 ml)', 'Median',     'S.D.',   'Minimum',  'Maximum', ...
+         'Left mean unfiltered PBF / (ml/min)/(100 ml)',  'Median',     'S.D.',   'Minimum',  'Maximum', ...
+         'Total mean unfiltered PBF / (ml/min)/(100 ml)', 'Median',     'S.D.',   'Minimum',  'Maximum' };
+Data = {  RightMu,                              RightMedian,  RightSD,  RightMini,  RightMaxi, ...
+          LinksMu,                              LinksMedian,  LinksSD,  LinksMini,  LinksMaxi, ...
+          TotalMu,                              TotalMedian,  TotalSD,  TotalMini,  TotalMaxi };
+Full = vertcat(Head, Data);
+
+xlswrite(XlsxFileName, Full, 'Unfiltered PBF');
+
+waitbar(double(6)/double(NTABS + 1), wb, sprintf('Saved 6 out of %1d tabs', NTABS));
 
 % Calculate statistics for the MTT
 Intercept = - 10.0;
@@ -1160,7 +1264,7 @@ Full = vertcat(Head, Data);
 
 xlswrite(XlsxFileName, Full, 'MTT');
 
-waitbar(double(5)/double(NTABS + 1), wb, sprintf('Saved 5 out of %1d tabs', NTABS));
+waitbar(double(7)/double(NTABS + 1), wb, sprintf('Saved 7 out of %1d tabs', NTABS));
 
 % Calculate statistics for the TTP
 Intercept = - 10.0;
@@ -1218,7 +1322,7 @@ Full = vertcat(Head, Data);
 
 xlswrite(XlsxFileName, Full, 'TTP');
 
-waitbar(double(6)/double(NTABS + 1), wb, sprintf('Saved 6 out of %1d tabs', NTABS));
+waitbar(double(8)/double(NTABS + 1), wb, sprintf('Saved 8 out of %1d tabs', NTABS));
 
 % Note any data censorship
 if (handles.CensorHighValues == true)
@@ -1233,7 +1337,7 @@ Full = vertcat(Head, Data);
 
 xlswrite(XlsxFileName, Full, 'Censorship');
 
-waitbar(double(7)/double(NTABS + 1), wb, sprintf('Saved 7 out of %1d tabs', NTABS));
+waitbar(double(9)/double(NTABS + 1), wb, sprintf('Saved 9 out of %1d tabs', NTABS));
 
 % Quit gracefully
 pause(0.5);
@@ -1679,7 +1783,9 @@ set(handles.DisplaySliceSlider, 'Enable', 'off');
 
 % The Display Menu controls - note that "Import Maps" will always be disabled in Segmentation mode
 set(handles.PBVRadio, 'Enable', 'off');
+set(handles.UnfilteredPBVRadio, 'Enable', 'off');
 set(handles.PBFRadio, 'Enable', 'off');
+set(handles.UnfilteredPBFRadio, 'Enable', 'off');
 set(handles.MTTRadio, 'Enable', 'off');
 set(handles.TTPRadio, 'Enable', 'off');
 set(handles.ProcessingMaskRadio, 'Enable', 'off');
@@ -1722,7 +1828,9 @@ set(handles.DisplaySliceSlider, 'Enable', 'on');
 
 % The Display Menu controls - note that "Import Maps" will always be disabled in Segmentation mode
 set(handles.PBVRadio, 'Enable', 'on');
+set(handles.UnfilteredPBVRadio, 'Enable', 'on');
 set(handles.PBFRadio, 'Enable', 'on');
+set(handles.UnfilteredPBFRadio, 'Enable', 'on');
 set(handles.MTTRadio, 'Enable', 'on');
 set(handles.TTPRadio, 'Enable', 'on');
 set(handles.ProcessingMaskRadio, 'Enable', 'on');

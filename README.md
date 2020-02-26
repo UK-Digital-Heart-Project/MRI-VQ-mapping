@@ -83,12 +83,14 @@ The mapping outputs are:
 ## Segmentation and Quantitation
 A simple GUI allows manual segmentation of the lungs from previously created perfusion maps.
 
-Statitistics may then be saved to an XLSX file. The 7 tabs provide information on:
+Statitistics may then be saved to an XLSX file. The 9 tabs provide information on:
 
 - Data dimensions and resolution.
 - Voxel counts and volumes in the segmented regions, including deficit fractions (volumes where no significant perfusion was observed).
 - PBV, including means, medians, standard deviations, minima and maxima.
+- Unfiltered PBV.
 - PBF.
+- Unfiltered PBF.
 - MTT.
 - TTP.
 - Data censorship.

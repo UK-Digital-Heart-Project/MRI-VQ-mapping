@@ -1909,6 +1909,8 @@ if strcmpi(handles.ProgramState, 'Segment') && (handles.SegmentationInProgress =
         handles.Data(~handles.TotalROI) = 0.0;
       case { 'MTT', 'TTP' } 
         handles.Data(~handles.TotalROI) = - 10.0;
+      case 'Processing Mask'
+        handles.Data(~handles.TotalROI) = 0.0;
     end
   end
 end

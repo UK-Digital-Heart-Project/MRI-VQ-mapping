@@ -108,3 +108,29 @@ This GUI allows segmentation using the original grayscale cine-stacks.
 Quantitation using the manually drawn regions-of-interest and the previously calculated perfusion maps may then carried out using the separate Segmentation-Quantitation GUI.
 
 ```This GUI was created using MATLAB 2015aSP1, and may not work correctly with earlier or later versions.```
+
+## Mapping Histograms
+Histograms are generated from segmented maps.
+
+Run the script ```pft_CreateHistograms```.
+
+The two inputs are:
+
+- The mapping data pickle.
+- The segmentation folder.
+
+The name of the output folder matches that of the segmentation folder.
+
+Histograms are created for the right and left lungs, both separately and together, for the following parameters:
+
+- PBV.
+- Unfiltered PBV.
+- PBF.
+- Unfiltered PBF.
+- MTT.
+- TTP.
+
+Graphs are stored in several formats - for use with further software downstream - and there are several PDF compilations,
+including one with a heavily decorated name to indicate the source of the data.
+
+```This script was created using MATLAB 2017b; use with earlier or later versions may alter the appearance of the graphs produced.```

@@ -377,6 +377,7 @@ handles.ReviewMapIsPresent = true;
 
 % Allow the image display axes to be captured
 set(handles.CaptureDisplayButton, 'Enable', 'on');
+set(handles.CreateMovieButton, 'Enable', 'on');
 
 % Update the HANDLES structure
 guidata(hObject, handles);
@@ -1792,6 +1793,7 @@ set(handles.ProcessingMaskRadio, 'Enable', 'off');
 
 set(handles.CensorHighValuesCheck, 'Enable', 'off');
 set(handles.CaptureDisplayButton, 'Enable', 'off');
+set(handles.CreateMovieButton, 'Enable', 'off');
 set(handles.LabelImagesCheck, 'Enable', 'off');
 
 % And finally, the segmentation controls themselves
@@ -1837,6 +1839,7 @@ set(handles.ProcessingMaskRadio, 'Enable', 'on');
 
 set(handles.CensorHighValuesCheck, 'Enable', 'on');
 set(handles.CaptureDisplayButton, 'Enable', 'on');
+set(handles.CreateMovieButton, 'Enable', 'on');
 set(handles.LabelImagesCheck, 'Enable', 'on');
 
 % And finally, the segmentation controls themselves
@@ -2030,4 +2033,110 @@ guidata(hObject, handles);
 handles = UpdateImageDisplay(handles);
 guidata(hObject, handles);
 
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function CreateMovieButton_Callback(hObject, eventdata, handles)
+
+% Offer the option to save the screenshot as an image
+Listing = dir(fullfile(handles.TargetFolder, 'Movies', sprintf('%s_Movie_*.avi', handles.FileNameStub)));
+Entries = { Listing.name };
+Folders = [ Listing.isdir ];
+Entries(Folders) = [];
+Entries = sort(Entries);
+Entries = Entries';
+
+if isempty(Entries)
+  Suffix = '001';  
+    
+  DefaultName = fullfile(handles.TargetFolder, 'Movies', sprintf('%s_Movie_001.avi', handles.FileNameStub));
+else
+  LastName = Entries{end};
+  p = strfind(LastName, '_');
+  q = p(end) + 1;
+  r = strfind(LastName, '.');
+  s = r(end) - 1;
+  String = LastName(q:s);
+  Number = str2num(String);
+  Number = Number + 1;
+  Suffix = sprintf('%03d', Number);
+    
+  DefaultName = fullfile(handles.TargetFolder, 'Movies', sprintf('%s_Movie_%s.avi', handles.FileNameStub, Suffix));
+end
+
+FilterSpec  = fullfile(handles.TargetFolder, 'Movies', '*.avi');
+DialogTitle = 'Save Movie As';
+
+[ FileName, PathName, FilterIndex ] = uiputfile(FilterSpec, DialogTitle, DefaultName);
+
+% Return if no file is chosen
+if (FilterIndex == 0)
+  guidata(hObject, handles);
+  return;
+end
+
+% Point to the output file
+MovieFileName = fullfile(PathName, FileName);
+
+% Determine the end slices - all present if in import-review mode, or just the segmented slices if in segment mode
+switch handles.ProgramState
+  case 'Import/Review'
+    Alpha = 1;
+    Omega = handles.NSLICES;
+
+  case 'Segment'
+    SegmentationPresent = false([handles.NSLICES, 1]);
+    
+    for s = 1:handles.NSLICES
+      Part = handles.TotalBinaryMask(:, :, s);
+      if any(Part(:))
+        SegmentationPresent(s) = true;
+      end
+    end
+    
+    Alpha = find(SegmentationPresent, 1, 'first');
+    Omega = find(SegmentationPresent, 1, 'last');
+end
+
+% Remember the current slice
+Here = handles.Slice;
+
+% Create and initialise a VideoWriter object
+VW = VideoWriter(MovieFileName, 'Uncompressed AVI');
+VW.FrameRate = 20;
+open(VW);
+
+% Disable controls whilst the movie is being created
+guidata(hObject, handles);
+handles = DisableControlsDuringSegmentation(handles);
+guidata(hObject, handles);
+     
+% Now create the frames and add them to the movie, slice by slice
+for s = Alpha:Omega
+  handles.Slice = s;
+  
+  guidata(hObject, handles);
+  handles = UpdateImageDisplay(handles);
+  guidata(hObject, handles);
+  
+  F = getframe(handles.ImageDisplayAxes);
+  X = F.cdata;
+  writeVideo(VW, X);  
+end
+
+close(VW);
+
+% Re-enable the previously disabled controls
+guidata(hObject, handles);
+handles = EnableControlsDuringSegmentation(handles);
+guidata(hObject, handles);
+
+% Return to the original slice
+handles.Slice = Here;
+
+guidata(hObject, handles);
+handles = UpdateImageDisplay(handles);
+guidata(hObject, handles);
+    
 end

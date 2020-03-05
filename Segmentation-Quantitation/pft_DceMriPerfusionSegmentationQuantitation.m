@@ -172,6 +172,9 @@ handles.CurrentColormapName = 'hot';
 handles.CurrentColormapSize = '256';
 handles.Colormap            = hot(256);
 
+% No movies are being created at the moment
+handles.MovieCreationInProgress = false;
+
 % Add listeners for a continuous slider response
 hDisplayCeilingSliderListener = addlistener(handles.DisplayCeilingSlider, 'ContinuousValueChange', @CB_DisplayCeilingSlider_Listener);
 setappdata(handles.DisplayCeilingSlider, 'MyListener', hDisplayCeilingSliderListener);
@@ -304,38 +307,44 @@ set(handles.DisplaySliceSlider, 'Value', handles.Slice);
 % Select the map to be viewed, and set units and scaling factors
 switch handles.ViewMap
   case 'PBV'
-    handles.Map = handles.PBV;
+    handles.Map       = handles.PBV;
     handles.Units     = 'ml/100 ml';
+    handles.CBUnits   = 'PBV [ml/100 ml]';
     handles.Intercept = 0.0;
     handles.Slope     = 0.01;
   case 'Unfiltered PBV'
-    handles.Map = handles.UnfilteredPBV;
+    handles.Map       = handles.UnfilteredPBV;
     handles.Units     = 'ml/100 ml';
+    handles.CBUnits   = 'Unfiltered PBV [ml/100 ml]';
     handles.Intercept = 0.0;
     handles.Slope     = 0.01;
   case 'PBF'
-    handles.Map = handles.PBF;
+    handles.Map       = handles.PBF;
     handles.Units     = '(ml/min)/100 ml';
+    handles.CBUnits   = 'PBF [(ml/min)/100 ml]';
     handles.Intercept = 0.0;
     handles.Slope     = 1.0;
   case 'Unfiltered PBF'
-    handles.Map = handles.UnfilteredPBF;
+    handles.Map       = handles.UnfilteredPBF;
     handles.Units     = '(ml/min)/100 ml';
+    handles.CBUnits   = 'Unfiltered PBF [(ml/min)/100 ml]';
     handles.Intercept = 0.0;
     handles.Slope     = 1.0;
   case 'MTT'
-    handles.Map = handles.MTT;
+    handles.Map       = handles.MTT;
     handles.Units     = 'sec';
+    handles.CBUnits   = 'MTT [sec]';
     handles.Intercept = - 10.0;
     handles.Slope     = 0.001;
   case 'TTP'
-    handles.Map = handles.TTP;
+    handles.Map       = handles.TTP;
     handles.Units     = 'sec';
+    handles.CBUnits   = 'TTP [sec]';
     handles.Intercept = - 10.0;
     handles.Slope     = 0.001;
   case 'Processing Mask'
-    handles.Map = handles.Mask;
-    handles.Units     = '';
+    handles.Map       = handles.Mask;
+    handles.Units     = 'Mask [Binary Scale]';
     handles.Intercept = 0.0;
     handles.Slope     = 1.0;
 end  
@@ -768,6 +777,11 @@ if (handles.SegmentationInProgress == true)
   return;
 end
 
+% Or, if a movie is being created
+if (handles.MovieCreationInProgress == true)
+  return;
+end
+
 % Fetch the current point w.r.t. the IMAGE AXES rather than the MAIN FIGURE
 P = get(handles.ImageDisplayAxes, 'CurrentPoint');
 
@@ -810,9 +824,6 @@ end
 
 function CaptureDisplayButton_Callback(hObject, eventdata, handles)
 
-F = getframe(handles.ImageDisplayAxes);
-X = F.cdata;
-
 % Offer the option to save the screenshot as an image
 Listing = dir(fullfile(handles.TargetFolder, 'Screenshots', sprintf('%s_Screenshot_*.png', handles.FileNameStub)));
 Entries = { Listing.name };
@@ -844,16 +855,41 @@ DialogTitle = 'Save Screenshot As';
 
 [ FileName, PathName, FilterIndex ] = uiputfile(FilterSpec, DialogTitle, DefaultName);
 
-if (FilterIndex ~= 0)
-  wb = waitbar(0.5, 'Exporting screenshot ... ');  
-    
-  imwrite(X, fullfile(PathName, FileName));
-  
-  pause(0.5);  
-  waitbar(1.0, wb, 'Export complete');
-  pause(0.5);
-  delete(wb);  
+% Quit if the user selects Cancel
+if (FilterIndex == 0)
+  guidata(hObject, handles);
+  return;
 end
+
+% Otherwise, create the screen capture
+wb = waitbar(0.5, 'Exporting image - please wait ...');
+
+set(handles.ImageDisplayAxes, 'Units', 'pixels');
+
+AP = get(handles.ImageDisplayAxes, 'Position');
+
+x0 = - 15;
+y0 = - 15;
+wd = AP(3) + 170;
+ht = AP(4) + 25;
+
+Rect = [ x0, y0, wd, ht ];
+
+Color = get(handles.MainFigure, 'Color');
+
+set(handles.MainFigure, 'Color', [1 1 1]);
+
+F = getframe(handles.ImageDisplayAxes, Rect);
+X = F.cdata;
+
+imwrite(X, fullfile(PathName, FileName));
+
+set(handles.MainFigure, 'Color', Color);
+
+pause(0.5);  
+waitbar(1.0, wb, 'Export complete');
+pause(0.5);
+delete(wb);  
 
 % Update the HANDLES structure - is this really necessary here, since "handles" is used in a read-only way here ? 
 guidata(hObject, handles);
@@ -1367,41 +1403,47 @@ end
 % Select the map to be viewed, and set units and scaling factors
 switch handles.ViewMap
   case 'PBV'
-    handles.Map = handles.PBV;
+    handles.Map       = handles.PBV;
     handles.Units     = 'ml/100 ml';
+    handles.CBUnits   = 'PBV [ml/100 ml]';
     handles.Intercept = 0.0;
     handles.Slope     = 0.01;
   case 'Unfiltered PBV'
-    handles.Map = handles.UnfilteredPBV;
+    handles.Map       = handles.UnfilteredPBV;
     handles.Units     = 'ml/100 ml';
+    handles.CBUnits   = 'Unfiltered PBV [ml/100 ml]';
     handles.Intercept = 0.0;
     handles.Slope     = 0.01;
   case 'PBF'
-    handles.Map = handles.PBF;
+    handles.Map       = handles.PBF;
     handles.Units     = '(ml/min)/100 ml';
+    handles.CBUnits   = 'PBF [(ml/min)/100 ml]';
     handles.Intercept = 0.0;
     handles.Slope     = 1.0;
   case 'Unfiltered PBF'
-    handles.Map = handles.UnfilteredPBF;
+    handles.Map       = handles.UnfilteredPBF;
     handles.Units     = '(ml/min)/100 ml';
+    handles.CBUnits   = 'Unfiltered PBF [(ml/min)/100 ml]';
     handles.Intercept = 0.0;
     handles.Slope     = 1.0;
   case 'MTT'
-    handles.Map = handles.MTT;
+    handles.Map       = handles.MTT;
     handles.Units     = 'sec';
+    handles.CBUnits   = 'MTT [sec]';
     handles.Intercept = - 10.0;
     handles.Slope     = 0.001;
   case 'TTP'
-    handles.Map = handles.TTP;
+    handles.Map       = handles.TTP;
     handles.Units     = 'sec';
+    handles.CBUnits   = 'TTP [sec]';
     handles.Intercept = - 10.0;
     handles.Slope     = 0.001;
   case 'Processing Mask'
-    handles.Map = handles.Mask;
-    handles.Units     = '';
+    handles.Map       = handles.Mask;
+    handles.Units     = 'Mask [Binary Scale]';
     handles.Intercept = 0.0;
     handles.Slope     = 1.0;
-end       
+end  
 
 % Rescale the data for floating-point display
 handles.Map = handles.Intercept + handles.Slope*double(handles.Map);
@@ -1461,38 +1503,44 @@ end
 % Select the map to be viewed, and set units and scaling factors
 switch handles.ViewMap
   case 'PBV'
-    handles.Map = handles.PBV;
+    handles.Map       = handles.PBV;
     handles.Units     = 'ml/100 ml';
+    handles.CBUnits   = 'PBV [ml/100 ml]';
     handles.Intercept = 0.0;
     handles.Slope     = 0.01;
   case 'Unfiltered PBV'
-    handles.Map = handles.UnfilteredPBV;
+    handles.Map       = handles.UnfilteredPBV;
     handles.Units     = 'ml/100 ml';
+    handles.CBUnits   = 'Unfiltered PBV [ml/100 ml]';
     handles.Intercept = 0.0;
     handles.Slope     = 0.01;
   case 'PBF'
-    handles.Map = handles.PBF;
+    handles.Map       = handles.PBF;
     handles.Units     = '(ml/min)/100 ml';
+    handles.CBUnits   = 'PBF [(ml/min)/100 ml]';
     handles.Intercept = 0.0;
     handles.Slope     = 1.0;
   case 'Unfiltered PBF'
-    handles.Map = handles.UnfilteredPBF;
+    handles.Map       = handles.UnfilteredPBF;
     handles.Units     = '(ml/min)/100 ml';
+    handles.CBUnits   = 'Unfiltered PBF [(ml/min)/100 ml]';
     handles.Intercept = 0.0;
     handles.Slope     = 1.0;
   case 'MTT'
-    handles.Map = handles.MTT;
+    handles.Map       = handles.MTT;
     handles.Units     = 'sec';
+    handles.CBUnits   = 'MTT [sec]';
     handles.Intercept = - 10.0;
     handles.Slope     = 0.001;
   case 'TTP'
-    handles.Map = handles.TTP;
+    handles.Map       = handles.TTP;
     handles.Units     = 'sec';
+    handles.CBUnits   = 'TTP [sec]';
     handles.Intercept = - 10.0;
     handles.Slope     = 0.001;
   case 'Processing Mask'
-    handles.Map = handles.Mask;
-    handles.Units     = '';
+    handles.Map       = handles.Mask;
+    handles.Units     = 'Mask [Binary Scale]';
     handles.Intercept = 0.0;
     handles.Slope     = 1.0;
 end       
@@ -1924,7 +1972,7 @@ handles.ImageDisplayAxesPosition = get(handles.ImageDisplayAxes, 'Position');
 
 handles.Colorbar = colorbar(handles.ImageDisplayAxes, 'EastOutside', 'FontSize', 16, 'FontWeight', 'bold');
 
-ylabel(handles.Colorbar, handles.Units, 'FontSize', 16, 'FontWeight', 'bold');
+ylabel(handles.Colorbar, handles.CBUnits, 'FontSize', 16, 'FontWeight', 'bold');
 
 set(handles.ImageDisplayAxes, 'Position', handles.ImageDisplayAxesPosition);
 
@@ -2076,6 +2124,10 @@ if (FilterIndex == 0)
   return;
 end
 
+% Disable motion events if movie creation is going to proceed - update the HANDLES structure immediately
+handles.MovieCreationInProgress = true;
+guidata(hObject, handles);
+
 % Point to the output file
 MovieFileName = fullfile(PathName, FileName);
 
@@ -2111,7 +2163,23 @@ open(VW);
 guidata(hObject, handles);
 handles = DisableControlsDuringSegmentation(handles);
 guidata(hObject, handles);
-     
+
+% Define the rectangle for frame capture
+set(handles.ImageDisplayAxes, 'Units', 'pixels');
+
+AP = get(handles.ImageDisplayAxes, 'Position');
+
+x0 = - 15;
+y0 = - 15;
+wd = AP(3) + 170;
+ht = AP(4) + 25;
+
+Rect = [ x0, y0, wd, ht ];
+
+Color = get(handles.MainFigure, 'Color');
+
+set(handles.MainFigure, 'Color', [1 1 1]);
+ 
 % Now create the frames and add them to the movie, slice by slice
 for s = Alpha:Omega
   handles.Slice = s;
@@ -2120,19 +2188,25 @@ for s = Alpha:Omega
   handles = UpdateImageDisplay(handles);
   guidata(hObject, handles);
   
-  F = getframe(handles.ImageDisplayAxes);
+  F = getframe(handles.ImageDisplayAxes, Rect);
   X = F.cdata;
   writeVideo(VW, X);  
 end
 
 close(VW);
 
+% Restore the colour of the main dialog
+set(handles.MainFigure, 'Color', Color);
+
+% Re-enable motion events in the image display axes
+handles.MovieCreationInProgress = false;
+
 % Re-enable the previously disabled controls
 guidata(hObject, handles);
 handles = EnableControlsDuringSegmentation(handles);
 guidata(hObject, handles);
 
-% Return to the original slice
+% Return to the original slice and update the HANDLES structure
 handles.Slice = Here;
 
 guidata(hObject, handles);

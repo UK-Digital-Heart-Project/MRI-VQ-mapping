@@ -51,8 +51,11 @@ handles.LinksROI = [];
 handles.TotalROI = [];
 
 % Also, there are no polygons available to be re-used
-handles.RightPolygon = [];
-handles.LinksPolygon = [];
+handles.MostRecentRightPolygon = [];
+handles.MostRecentLinksPolygon = [];
+
+handles.LocalRightPolygon = {};
+handles.LocalLinksPolygon = {};
 
 handles.ReuseLastROI = true;
 
@@ -418,6 +421,16 @@ handles.ReviewImageIsPresent = true;
 if ~isempty(handles.RoiParentFolder)
   set(handles.SegmentRadio, 'Enable', 'on');
 end
+
+% Invalidate any segmentation polygons created for a previous data set
+handles.MostRecentRightPolygon = [];
+handles.MostRecentLinksPolygon = [];
+
+handles.LocalRightPolygon = {};
+handles.LocalLinksPolygon = {};
+
+handles.LocalRightPolygon = cell([handles.NSLICES, 1]);
+handles.LocalLinksPolygon = cell([handles.NSLICES, 1]);
 
 % Update the HANDLES structure
 guidata(hObject, handles);
@@ -1016,8 +1029,8 @@ handles = UpdateImageDisplay(handles);
 guidata(hObject, handles);
 
 % Prompt for a polygon defining the outline of the right lung
-if (handles.ReuseLastROI == true) && ~isempty(handles.RightPolygon)
-  hp = impoly(handles.ImageDisplayAxes, handles.RightPolygon);
+if (handles.ReuseLastROI == true) && ~isempty(handles.MostRecentRightPolygon)
+  hp = impoly(handles.ImageDisplayAxes, handles.MostRecentRightPolygon);
 else
   hp = impoly(handles.ImageDisplayAxes);
 end
@@ -1034,7 +1047,8 @@ handles.RightBinaryMask(:, :, handles.Slice) = logical(BW);
 
 handles.TotalBinaryMask(:, :, handles.Slice) = handles.RightBinaryMask(:, :, handles.Slice) | handles.LinksBinaryMask(:, :, handles.Slice);
 
-handles.RightPolygon = XY;
+handles.MostRecentRightPolygon = XY;
+handles.LocalRightPolygon{handles.Slice} = XY;
 
 % Re-enable most of the controls
 guidata(hObject, handles);
@@ -1073,8 +1087,8 @@ handles = UpdateImageDisplay(handles);
 guidata(hObject, handles);
 
 % Prompt for a polygon defining the outline of the right lung
-if (handles.ReuseLastROI == true) && ~isempty(handles.LinksPolygon)
-  hp = impoly(handles.ImageDisplayAxes, handles.LinksPolygon);
+if (handles.ReuseLastROI == true) && ~isempty(handles.MostRecentLinksPolygon)
+  hp = impoly(handles.ImageDisplayAxes, handles.MostRecentLinksPolygon);
 else
   hp = impoly(handles.ImageDisplayAxes);
 end
@@ -1091,7 +1105,8 @@ handles.LinksBinaryMask(:, :, handles.Slice) = logical(BW);
 
 handles.TotalBinaryMask(:, :, handles.Slice) = handles.LinksBinaryMask(:, :, handles.Slice) | handles.RightBinaryMask(:, :, handles.Slice);
 
-handles.LinksPolygon = XY;
+handles.MostRecentLinksPolygon = XY;
+handles.LocalLinksPolygon{handles.Slice} = XY;
 
 % Re-enable most of the controls
 guidata(hObject, handles);
@@ -1122,17 +1137,20 @@ handles.RightBinaryMask(:, :, handles.Slice) = false;
 
 handles.TotalBinaryMask(:, :, handles.Slice) = handles.RightBinaryMask(:, :, handles.Slice) | handles.LinksBinaryMask(:, :, handles.Slice);
 
+% Mark the "local" polygon as missing
+handles.LocalRightPolygon{handles.Slice} = [];
+
 % Update the display
 guidata(hObject, handles);
 handles = UpdateImageDisplay(handles);
 guidata(hObject, handles);
 
-% Write out the binary mask to the appropriate folder
+% Delete the binary mask in the appropriate folder
 OutputFileName = fullfile(handles.RoiParentFolder, 'Right Lung', sprintf('Binary-Mask-Slice-%03d.png', handles.Slice));
                       
-BW = handles.RightBinaryMask(:, :, handles.Slice);
-                      
-imwrite(BW, OutputFileName);
+if (exist(OutputFileName, 'file') == 2)
+  delete(OutputFileName);
+end
 
 end
 
@@ -1145,17 +1163,20 @@ handles.LinksBinaryMask(:, :, handles.Slice) = false;
 
 handles.TotalBinaryMask(:, :, handles.Slice) = handles.LinksBinaryMask(:, :, handles.Slice) | handles.RightBinaryMask(:, :, handles.Slice);
 
+% Mark the "local" polygon as missing
+handles.LocalLinksPolygon{handles.Slice} = [];
+
 % Update the display
 guidata(hObject, handles);
 handles = UpdateImageDisplay(handles);
 guidata(hObject, handles);
 
-% Write out the binary mask to the appropriate folder
+% Delete the binary mask in the appropriate folder
 OutputFileName = fullfile(handles.RoiParentFolder, 'Left Lung', sprintf('Binary-Mask-Slice-%03d.png', handles.Slice));
                       
-BW = handles.LinksBinaryMask(:, :, handles.Slice);
-                      
-imwrite(BW, OutputFileName);
+if (exist(OutputFileName, 'file') == 2)
+  delete(OutputFileName);
+end
 
 end
 
@@ -1206,8 +1227,10 @@ set(handles.DownsamplingX8Radio, 'Enable', 'off');
 set(handles.ReuseLastROICheck, 'Enable', 'off');
 set(handles.CreateRightLungROIButton, 'Enable', 'off');
 set(handles.DeleteRightLungROIButton, 'Enable', 'off');
+set(handles.ModifyRightLungROIButton, 'Enable', 'off');
 set(handles.CreateLeftLungROIButton, 'Enable', 'off');
 set(handles.DeleteLeftLungROIButton, 'Enable', 'off');
+set(handles.ModifyLeftLungROIButton, 'Enable', 'off');
 
 % Return an updated HANDLES structure to the calling function
 guidata(handles.MainFigure, handles);
@@ -1249,8 +1272,10 @@ set(handles.DownsamplingX8Radio, 'Enable', 'on');
 set(handles.ReuseLastROICheck, 'Enable', 'on');
 set(handles.CreateRightLungROIButton, 'Enable', 'on');
 set(handles.DeleteRightLungROIButton, 'Enable', 'on');
+set(handles.ModifyRightLungROIButton, 'Enable', 'on');
 set(handles.CreateLeftLungROIButton, 'Enable', 'on');
 set(handles.DeleteLeftLungROIButton, 'Enable', 'on');
+set(handles.ModifyLeftLungROIButton, 'Enable', 'on');
 
 % Return an updated HANDLES structure to the calling function
 guidata(handles.MainFigure, handles);
@@ -1267,8 +1292,10 @@ function handles = DisableSegmentationControls(handles)
 set(handles.ReuseLastROICheck, 'Enable', 'off');
 set(handles.CreateRightLungROIButton, 'Enable', 'off');
 set(handles.DeleteRightLungROIButton, 'Enable', 'off');
+set(handles.ModifyRightLungROIButton, 'Enable', 'off');
 set(handles.CreateLeftLungROIButton, 'Enable', 'off');
 set(handles.DeleteLeftLungROIButton, 'Enable', 'off');
+set(handles.ModifyLeftLungROIButton, 'Enable', 'off');
 
 % Return an updated HANDLES structure to the calling function
 guidata(handles.MainFigure, handles);
@@ -1285,8 +1312,10 @@ function handles = EnableSegmentationControls(handles)
 set(handles.ReuseLastROICheck, 'Enable', 'on');
 set(handles.CreateRightLungROIButton, 'Enable', 'on');
 set(handles.DeleteRightLungROIButton, 'Enable', 'on');
+set(handles.ModifyRightLungROIButton, 'Enable', 'on');
 set(handles.CreateLeftLungROIButton, 'Enable', 'on');
 set(handles.DeleteLeftLungROIButton, 'Enable', 'on');
+set(handles.ModifyLeftLungROIButton, 'Enable', 'on');
 
 % Return an updated HANDLES structure to the calling function
 guidata(handles.MainFigure, handles);
@@ -1696,3 +1725,129 @@ guidata(hObject, handles);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function ModifyRightLungROIButton_Callback(hObject, eventdata, handles)
+
+% Disable any response to motion events immediately
+handles.SegmentationInProgress = true;
+guidata(hObject, handles);
+
+% Disable controls during segmentation - notice the HANDLES update just above
+handles = DisableControlsDuringSegmentation(handles);
+guidata(hObject, handles);
+
+% Update the display - notice the HANDLES update just above
+handles = UpdateImageDisplay(handles);
+guidata(hObject, handles);
+
+% Prompt for a polygon defining the outline of the right lung
+if ~isempty(handles.LocalRightPolygon{handles.Slice})
+  hp = impoly(handles.ImageDisplayAxes, handles.LocalRightPolygon{handles.Slice});   
+elseif (handles.ReuseLastROI == true) && ~isempty(handles.MostRecentRightPolygon)
+  hp = impoly(handles.ImageDisplayAxes, handles.MostRecentRightPolygon);
+else
+  hm = msgbox('No ROI available - start afresh', 'Info', 'modal');
+  uiwait(hm);
+  delete(hm);
+    
+  hp = impoly(handles.ImageDisplayAxes);
+end
+
+hp.Deletable = false;
+setVerticesDraggable(hp, true);
+wait(hp);
+
+BW = createMask(hp);
+XY = getPosition(hp);
+delete(hp);
+
+handles.RightBinaryMask(:, :, handles.Slice) = logical(BW);
+
+handles.TotalBinaryMask(:, :, handles.Slice) = handles.RightBinaryMask(:, :, handles.Slice) | handles.LinksBinaryMask(:, :, handles.Slice);
+
+handles.MostRecentRightPolygon = XY;
+handles.LocalRightPolygon{handles.Slice} = XY;
+
+% Re-enable most of the controls
+guidata(hObject, handles);
+handles = EnableControlsDuringSegmentation(handles);
+guidata(hObject, handles);
+
+% Exit from segmentation mode - note the HANDLES update above
+handles.SegmentationInProgress = false;
+guidata(hObject, handles);
+
+% Update the display - note the HANDLES update above
+handles = UpdateImageDisplay(handles);
+guidata(hObject, handles);
+
+% Write out the binary mask to the appropriate folder
+OutputFileName = fullfile(handles.RoiParentFolder, 'Right Lung', sprintf('Binary-Mask-Slice-%03d.png', handles.Slice));
+                      
+imwrite(BW, OutputFileName);
+
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function ModifyLeftLungROIButton_Callback(hObject, eventdata, handles)
+
+% Disable any response to motion events immediately
+handles.SegmentationInProgress = true;
+guidata(hObject, handles);
+
+% Disable controls during segmentation - notice the HANDLES update just above
+handles = DisableControlsDuringSegmentation(handles);
+guidata(hObject, handles);
+
+% Update the display - notice the HANDLES update just above
+handles = UpdateImageDisplay(handles);
+guidata(hObject, handles);
+
+% Prompt for a polygon defining the outline of the right lung
+if ~isempty(handles.LocalLinksPolygon{handles.Slice})
+  hp = impoly(handles.ImageDisplayAxes, handles.LocalLinksPolygon{handles.Slice});   
+elseif (handles.ReuseLastROI == true) && ~isempty(handles.MostRecentLinksPolygon)
+  hp = impoly(handles.ImageDisplayAxes, handles.MostRecentLinksPolygon);
+else
+  hm = msgbox('No ROI available - start afresh', 'Info', 'modal');
+  uiwait(hm);
+  delete(hm);
+    
+  hp = impoly(handles.ImageDisplayAxes);
+end
+
+hp.Deletable = false;
+setVerticesDraggable(hp, true);
+wait(hp);
+
+BW = createMask(hp);
+XY = getPosition(hp);
+delete(hp);
+
+handles.LinksBinaryMask(:, :, handles.Slice) = logical(BW);
+
+handles.TotalBinaryMask(:, :, handles.Slice) = handles.LinksBinaryMask(:, :, handles.Slice) | handles.LinksBinaryMask(:, :, handles.Slice);
+
+handles.MostRecentLinksPolygon = XY;
+handles.LocalLinksPolygon{handles.Slice} = XY;
+
+% Re-enable most of the controls
+guidata(hObject, handles);
+handles = EnableControlsDuringSegmentation(handles);
+guidata(hObject, handles);
+
+% Exit from segmentation mode - note the HANDLES update above
+handles.SegmentationInProgress = false;
+guidata(hObject, handles);
+
+% Update the display - note the HANDLES update above
+handles = UpdateImageDisplay(handles);
+guidata(hObject, handles);
+
+% Write out the binary mask to the appropriate folder
+OutputFileName = fullfile(handles.RoiParentFolder, 'Right Lung', sprintf('Binary-Mask-Slice-%03d.png', handles.Slice));
+                      
+imwrite(BW, OutputFileName);
+
+end

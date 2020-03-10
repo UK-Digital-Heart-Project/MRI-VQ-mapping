@@ -54,8 +54,8 @@ handles.TotalROI = [];
 handles.MostRecentRightPolygon = [];
 handles.MostRecentLinksPolygon = [];
 
-handles.LocalRightPolygon = {};
-handles.LocalLinksPolygon = {};
+handles.LocalRightPolygons = {};
+handles.LocalLinksPolygons = {};
 
 handles.ReuseLastROI = true;
 
@@ -426,11 +426,11 @@ end
 handles.MostRecentRightPolygon = [];
 handles.MostRecentLinksPolygon = [];
 
-handles.LocalRightPolygon = {};
-handles.LocalLinksPolygon = {};
+handles.LocalRightPolygons = {};
+handles.LocalLinksPolygons = {};
 
-handles.LocalRightPolygon = cell([handles.NSLICES, 1]);
-handles.LocalLinksPolygon = cell([handles.NSLICES, 1]);
+handles.LocalRightPolygons = cell([handles.NSLICES, 1]);
+handles.LocalLinksPolygons = cell([handles.NSLICES, 1]);
 
 % Update the HANDLES structure
 guidata(hObject, handles);
@@ -1048,7 +1048,7 @@ handles.RightBinaryMask(:, :, handles.Slice) = logical(BW);
 handles.TotalBinaryMask(:, :, handles.Slice) = handles.RightBinaryMask(:, :, handles.Slice) | handles.LinksBinaryMask(:, :, handles.Slice);
 
 handles.MostRecentRightPolygon = XY;
-handles.LocalRightPolygon{handles.Slice} = XY;
+handles.LocalRightPolygons{handles.Slice} = XY;
 
 % Re-enable most of the controls
 guidata(hObject, handles);
@@ -1106,7 +1106,7 @@ handles.LinksBinaryMask(:, :, handles.Slice) = logical(BW);
 handles.TotalBinaryMask(:, :, handles.Slice) = handles.LinksBinaryMask(:, :, handles.Slice) | handles.RightBinaryMask(:, :, handles.Slice);
 
 handles.MostRecentLinksPolygon = XY;
-handles.LocalLinksPolygon{handles.Slice} = XY;
+handles.LocalLinksPolygons{handles.Slice} = XY;
 
 % Re-enable most of the controls
 guidata(hObject, handles);
@@ -1138,7 +1138,7 @@ handles.RightBinaryMask(:, :, handles.Slice) = false;
 handles.TotalBinaryMask(:, :, handles.Slice) = handles.RightBinaryMask(:, :, handles.Slice) | handles.LinksBinaryMask(:, :, handles.Slice);
 
 % Mark the "local" polygon as missing
-handles.LocalRightPolygon{handles.Slice} = [];
+handles.LocalRightPolygons{handles.Slice} = [];
 
 % Update the display
 guidata(hObject, handles);
@@ -1164,7 +1164,7 @@ handles.LinksBinaryMask(:, :, handles.Slice) = false;
 handles.TotalBinaryMask(:, :, handles.Slice) = handles.LinksBinaryMask(:, :, handles.Slice) | handles.RightBinaryMask(:, :, handles.Slice);
 
 % Mark the "local" polygon as missing
-handles.LocalLinksPolygon{handles.Slice} = [];
+handles.LocalLinksPolygons{handles.Slice} = [];
 
 % Update the display
 guidata(hObject, handles);
@@ -1393,6 +1393,20 @@ switch handles.ProgramState
   case 'Import/Review'
     set(handles.RightLungROIFolderEdit, 'String', '  Right Lung ROI Folder:');
     set(handles.LinksLungROIFolderEdit, 'String', '  Left Lung ROI Folder: ');    
+    
+    % Write out the Polygons pickle file on returning from Segment mode 
+    PolygonsFile = fullfile(handles.RoiParentFolder, 'Polygons.mat');
+    
+    if (exist(PolygonsFile, 'file') == 2)
+      delete(PolygonsFile);
+    end
+    
+    MRRP = handles.MostRecentRightPolygon;
+    MRLP = handles.MostRecentLinksPolygon;
+    LRPS = handles.LocalRightPolygons;
+    LLPS = handles.LocalLinksPolygons;
+    
+    save(PolygonsFile, 'MRRP', 'MRLP', 'LRPS', 'LLPS');      
    
   case 'Segment'
     % Read in the right binary mask stack
@@ -1425,6 +1439,18 @@ switch handles.ProgramState
   
     % Combine the two maps
     handles.TotalBinaryMask = handles.RightBinaryMask | handles.LinksBinaryMask;
+    
+    % Read in the data from the Polygons pickle file on enteringSegment mode 
+    PolygonsFile = fullfile(handles.RoiParentFolder, 'Polygons.mat');
+    
+    if (exist(PolygonsFile, 'file') == 2)
+      s = load(PolygonsFile);
+      
+      handles.MostRecentRightPolygon = s.MRRP;
+      handles.MostRecentLinksPolygon = s.MRLP;
+      handles.LocalRightPolygons = s.LRPS;
+      handles.LocalLinksPolygons = s.LLPS;
+    end
     
 end    
 
@@ -1741,8 +1767,8 @@ handles = UpdateImageDisplay(handles);
 guidata(hObject, handles);
 
 % Prompt for a polygon defining the outline of the right lung
-if ~isempty(handles.LocalRightPolygon{handles.Slice})
-  hp = impoly(handles.ImageDisplayAxes, handles.LocalRightPolygon{handles.Slice});   
+if ~isempty(handles.LocalRightPolygons{handles.Slice})
+  hp = impoly(handles.ImageDisplayAxes, handles.LocalRightPolygons{handles.Slice});   
 elseif (handles.ReuseLastROI == true) && ~isempty(handles.MostRecentRightPolygon)
   hp = impoly(handles.ImageDisplayAxes, handles.MostRecentRightPolygon);
 else
@@ -1766,7 +1792,7 @@ handles.RightBinaryMask(:, :, handles.Slice) = logical(BW);
 handles.TotalBinaryMask(:, :, handles.Slice) = handles.RightBinaryMask(:, :, handles.Slice) | handles.LinksBinaryMask(:, :, handles.Slice);
 
 handles.MostRecentRightPolygon = XY;
-handles.LocalRightPolygon{handles.Slice} = XY;
+handles.LocalRightPolygons{handles.Slice} = XY;
 
 % Re-enable most of the controls
 guidata(hObject, handles);
@@ -1805,8 +1831,8 @@ handles = UpdateImageDisplay(handles);
 guidata(hObject, handles);
 
 % Prompt for a polygon defining the outline of the right lung
-if ~isempty(handles.LocalLinksPolygon{handles.Slice})
-  hp = impoly(handles.ImageDisplayAxes, handles.LocalLinksPolygon{handles.Slice});   
+if ~isempty(handles.LocalLinksPolygons{handles.Slice})
+  hp = impoly(handles.ImageDisplayAxes, handles.LocalLinksPolygons{handles.Slice});   
 elseif (handles.ReuseLastROI == true) && ~isempty(handles.MostRecentLinksPolygon)
   hp = impoly(handles.ImageDisplayAxes, handles.MostRecentLinksPolygon);
 else
@@ -1830,7 +1856,7 @@ handles.LinksBinaryMask(:, :, handles.Slice) = logical(BW);
 handles.TotalBinaryMask(:, :, handles.Slice) = handles.LinksBinaryMask(:, :, handles.Slice) | handles.LinksBinaryMask(:, :, handles.Slice);
 
 handles.MostRecentLinksPolygon = XY;
-handles.LocalLinksPolygon{handles.Slice} = XY;
+handles.LocalLinksPolygons{handles.Slice} = XY;
 
 % Re-enable most of the controls
 guidata(hObject, handles);

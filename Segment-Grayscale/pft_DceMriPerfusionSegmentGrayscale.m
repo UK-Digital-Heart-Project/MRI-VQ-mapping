@@ -1853,7 +1853,7 @@ delete(hp);
 
 handles.LinksBinaryMask(:, :, handles.Slice) = logical(BW);
 
-handles.TotalBinaryMask(:, :, handles.Slice) = handles.LinksBinaryMask(:, :, handles.Slice) | handles.LinksBinaryMask(:, :, handles.Slice);
+handles.TotalBinaryMask(:, :, handles.Slice) = handles.LinksBinaryMask(:, :, handles.Slice) | handles.RightBinaryMask(:, :, handles.Slice);
 
 handles.MostRecentLinksPolygon = XY;
 handles.LocalLinksPolygons{handles.Slice} = XY;
@@ -1872,7 +1872,7 @@ handles = UpdateImageDisplay(handles);
 guidata(hObject, handles);
 
 % Write out the binary mask to the appropriate folder
-OutputFileName = fullfile(handles.RoiParentFolder, 'Right Lung', sprintf('Binary-Mask-Slice-%03d.png', handles.Slice));
+OutputFileName = fullfile(handles.RoiParentFolder, 'Left Lung', sprintf('Binary-Mask-Slice-%03d.png', handles.Slice));
                       
 imwrite(BW, OutputFileName);
 

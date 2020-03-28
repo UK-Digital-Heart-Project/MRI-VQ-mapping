@@ -158,7 +158,14 @@ fid = fopen('Colormaps.txt', 'rt');
 Strings = textscan(fid, '%s');
 fclose(fid);
 
-handles.ColormapNames = Strings{1};
+handles.MatlabLutNames = Strings{1};
+
+S = load('FijiLuts.mat');
+
+handles.FijiLutNames = cellfun(@(c) c.FijiLutName, S.Pickle, 'UniformOutput', false);
+handles.FijiLuts     = cellfun(@(c) c.CM, S.Pickle, 'UniformOutput', false);
+
+handles.ColormapNames = vertcat(handles.MatlabLutNames, handles.FijiLutNames);
 set(handles.ColormapListBox, 'String', handles.ColormapNames);
 M = find(strcmpi(handles.ColormapNames, 'hot'), 1, 'first');
 set(handles.ColormapListBox, 'Value', M);
@@ -697,11 +704,18 @@ V = get(hObject, 'Value');
 
 handles.CurrentColormapName = handles.ColormapNames{V};
 
-% Check for the one exceptional case which does not take a size parameter
-if strcmpi(handles.CurrentColormapName, 'vga')
-  handles.Colormap = vga;
+% Divide the search between the MATLAB standard and Fili colormaps - treat the VGA case specially
+M = find(strcmpi(handles.MatlabLutNames, handles.CurrentColormapName), 1, 'first');
+
+if ~isempty(M)
+  if strcmpi(handles.CurrentColormapName, 'vga')
+    handles.Colormap = vga; 
+  else
+    handles.Colormap = eval(sprintf('%s(%s)', handles.CurrentColormapName, handles.CurrentColormapSize));
+  end
 else
-  handles.Colormap = eval(sprintf('%s(%s)', handles.CurrentColormapName, handles.CurrentColormapSize));
+  N = find(strcmpi(handles.FijiLutNames, handles.CurrentColormapName), 1, 'first');
+  handles.Colormap = handles.FijiLuts{N};
 end
 
 % Apply the colormap to the image axes
@@ -731,11 +745,18 @@ V = get(hObject, 'Value');
 
 handles.CurrentColormapSize = handles.ColormapSizes{V};
 
-% Check for the one exceptional case which does not take a size parameter
-if strcmpi(handles.CurrentColormapName, 'vga')
-  handles.Colormap = vga;
+% Divide the search between the MATLAB standard and Fili colormaps - treat the VGA case specially
+M = find(strcmpi(handles.MatlabLutNames, handles.CurrentColormapName), 1, 'first');
+
+if ~isempty(M)
+  if strcmpi(handles.CurrentColormapName, 'vga')
+    handles.Colormap = vga; 
+  else
+    handles.Colormap = eval(sprintf('%s(%s)', handles.CurrentColormapName, handles.CurrentColormapSize));
+  end
 else
-  handles.Colormap = eval(sprintf('%s(%s)', handles.CurrentColormapName, handles.CurrentColormapSize));
+  N = find(strcmpi(handles.FijiLutNames, handles.CurrentColormapName), 1, 'first');
+  handles.Colormap = handles.FijiLuts{N};
 end
 
 % Apply the colormap to the image axes

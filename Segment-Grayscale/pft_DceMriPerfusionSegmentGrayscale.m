@@ -658,6 +658,17 @@ function DisplaySliceSlider_Callback(hObject, eventdata, handles)
 handles.Slice = round(get(hObject, 'Value'));
 set(handles.DisplaySliceEdit, 'String', sprintf('  Slice: %3d', handles.Slice));
 
+switch handles.Reduction
+  case 1
+    handles.CurrentSliceLocation = handles.SLx1(handles.Slice);
+  case 2
+    handles.CurrentSliceLocation = handles.SLx2(handles.Slice);
+  case 4
+    handles.CurrentSliceLocation = handles.SLx4(handles.Slice);
+  case 8
+    handles.CurrentSliceLocation = handles.SLx8(handles.Slice);
+end
+
 % Update the HANDLES structure and display the image
 guidata(hObject, handles);
 handles = UpdateImageDisplay(handles);
@@ -677,6 +688,17 @@ end
 % Fetch the current slice
 handles.Slice = round(get(hObject, 'Value'));
 set(handles.DisplaySliceEdit, 'String', sprintf('  Slice: %3d', handles.Slice));
+
+switch handles.Reduction
+  case 1
+    handles.CurrentSliceLocation = handles.SLx1(handles.Slice);
+  case 2
+    handles.CurrentSliceLocation = handles.SLx2(handles.Slice);
+  case 4
+    handles.CurrentSliceLocation = handles.SLx4(handles.Slice);
+  case 8
+    handles.CurrentSliceLocation = handles.SLx8(handles.Slice);
+end
 
 % Update the HANDLES structure and display the image
 guidata(hObject, handles);

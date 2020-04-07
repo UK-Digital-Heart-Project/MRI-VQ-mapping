@@ -178,3 +178,5 @@ The application interrogates the input pickle file to determine which maps are p
 along the right-hand edge. This is designed to accommodate pickle files containing different collections of maps,
 calculated by a later version of the mapping GUI.
 
+```This MATLAB GUIDE application was created with MATLAB 2017b. Graphics may appear slightly different in earlier or later versions.```
+

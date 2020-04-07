@@ -134,3 +134,47 @@ Graphs are stored in several formats - for use with further software downstream 
 including one with a heavily decorated name to indicate the source of the data.
 
 ```This script was created using MATLAB 2017b; use with earlier or later versions may alter the appearance of the graphs produced.```
+
+## Create Overlays
+Overlays of segmented perfusion maps on a grayscale background are created (movies or single frames).
+
+Run the function ```pft_CreatePerfusionOverlays```.
+
+The three inputs are:
+
+- The mapping data pickle.
+- The segmentation folder.
+- The grayscale cine-stack.
+
+The second is inferred from the first; it has the same name (without the suffix) and must be correctly located within the folder structure.
+
+Three text-mode start-up files need to be edited by hand for the application to work in a specific user environment.
+
+The possible outputs are:
+
+- PNG screen captures.
+- AVI movies.
+
+The operation of the GUI is WYSIWIG and the interface is self-explanatory.
+
+All controls affecting the appearance of the display in the image axes are immediately responsive.
+
+The available compositions are:
+
+- Grayscale slices.
+- Grayscale slices with overlays.
+- Grayscale epochs.
+- Grayscale epochs with overlays.
+- Maps only.
+
+Segmentation may be turned on or off.
+
+Movies may include all the slices, or just those between the first and last included in the segmentation.
+
+The opacity control allows the creation of "overlays" containing just the grayscale slice, or only the perfusion map,
+or a transparent rendition of the two.
+
+The application interrogates the input pickle file to determine which maps are present - note the greyed "View Map" controls
+along the right-hand edge. This is designed to accommodate pickle files containing different collections of maps,
+calculated by a later version of the mapping GUI.
+

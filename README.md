@@ -58,7 +58,7 @@ The pixel-wise mapping is performed by deconvolving a measured ```Arterial Input
 - Pulmonary Blood Volume (PBV), with and without filtering (apodisation of the AIF and time-course).
 - Pulmonary Blood Flow (PBF), again, with and without filtering.
 - Time to Peak (TTP).
-- Mean Transit Time (MTT).
+- Mean Transit Time (MTT). This is calculated using the central moment theorem, making MTT a primary quantity and PBF = PBV/MTT secondary.
 
 The user is required to set:
 
@@ -78,7 +78,37 @@ The mapping outputs are:
 - A MAT-format pickle file conatining the 6 maps, plus the ROI.
 - A folder of the maps in DICOM format, organised into sub-folders. 
 
+The working reference is:
+
+Perfusion: DSC & DCE Basics and Analysis.
+Linda Knutsson, Proc. Intl. Soc. Magn. Reson. Med. 21, (2013).
+
 ```This GUI was created using MATLAB 2015aSP1, and may not work correctly with earlier or later versions.```
+
+## Perfusion Mapping for MacOS
+
+In the folder ```Perfusion-GUIDE-Project-MacOS```, use the function ```pft_DceMriPerfusionGuiMacOS.m```.
+
+The only difference from the Windows version is that output summaries are written as single-page CSV files,
+rather than XLSX files with multiple tabs.
+
+
+## Perfusion Mapping - Ingrisch Version
+
+In the folder ```Perfusion-GUIDE-Project-Ingrisch```, use the function ```pft_DceMriPerfusionGuiIngrisch.m```.
+
+The working reference is:
+
+Quantitative Pulmonary Perfusion Magnetic Resonance Imaging: Influence of Temporal Resolution and Signal-to-Noise Ratio.
+Michael Ingrisch et al, Investigative Radiology 45(1), pp.7-14, January 2010.
+
+The cross-correlation between the time-course and the AIF is used together with the PBV to perform a semi-automatic
+segmentation of the lungs from the rest of the anatomy. This thresholding step is computationally expensive and the execution
+is accordingly slow.
+
+## Perfusion Mapping - Ingrisch Version for MacOS
+
+In the folder ```Perfusion-GUIDE-Project-Ingrisch-MacOS```, use the function ```pft_DceMriPerfusionGuiIngrischMacOS.m```.
 
 ## Segmentation and Quantitation
 A simple GUI allows manual segmentation of the lungs from previously created perfusion maps.

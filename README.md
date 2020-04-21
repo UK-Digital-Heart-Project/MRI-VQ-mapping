@@ -106,6 +106,8 @@ The cross-correlation between the time-course and the AIF is used together with 
 segmentation of the lungs from the rest of the anatomy. This thresholding step is computationally expensive and the execution
 is accordingly slow.
 
+Here, the PBF is estimated from the peak of the residue function after deconvolution, making PBF a primary measure and MTT = PBV/PBF secondary.
+
 ## Perfusion Mapping - Ingrisch Version for MacOS
 
 In the folder ```Perfusion-GUIDE-Project-Ingrisch-MacOS```, use the function ```pft_DceMriPerfusionGuiIngrischMacOS.m```.

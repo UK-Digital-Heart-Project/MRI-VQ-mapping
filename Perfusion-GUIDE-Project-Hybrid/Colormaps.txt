@@ -1,0 +1,14 @@
+parula
+hsv
+hot
+gray
+bone
+copper
+pink
+vga
+jet
+cool
+autumn
+spring
+winter
+summer

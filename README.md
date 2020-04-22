@@ -92,7 +92,6 @@ In the folder ```Perfusion-GUIDE-Project-MacOS```, use the function ```pft_DceMr
 The only difference from the Windows version is that output summaries are written as single-page CSV files,
 rather than XLSX files with multiple tabs.
 
-
 ## Perfusion Mapping - Ingrisch Version
 
 In the folder ```Perfusion-GUIDE-Project-Ingrisch```, use the function ```pft_DceMriPerfusionGuiIngrisch.m```.
@@ -111,6 +110,18 @@ Here, the PBF is estimated from the peak of the residue function after deconvolu
 ## Perfusion Mapping - Ingrisch Version for MacOS
 
 In the folder ```Perfusion-GUIDE-Project-Ingrisch-MacOS```, use the function ```pft_DceMriPerfusionGuiIngrischMacOS.m```.
+
+## Perfusion Mapping - Hybrid Version
+
+In the folder ```Perfusion-GUIDE-Project-Hybrid```, use the function ```pft_DceMriPerfusionGuiHybrid.m```.
+
+This GUI combines the simple thresholding of the original "Mapping" workflow with the calculations of the "Ingrisch" method.
+
+A percentage signal threshold is required from the user, and interpolation around the peak of the residue function is optional.
+
+## Perfusion Mapping - Hybrid Version for MacOS
+
+In the folder ```Perfusion-GUIDE-Project-Hybrid-MacOS```, use the function ```pft_DceMriPerfusionGuiHybridMacOS.m```.
 
 ## Segmentation and Quantitation
 A simple GUI allows manual segmentation of the lungs from previously created perfusion maps.

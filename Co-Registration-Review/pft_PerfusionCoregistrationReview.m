@@ -166,7 +166,7 @@ end
 function ImportCineStacksButton_Callback(hObject, eventdata, handles)
 
 % Prompt for a MAT file - do nothing if none is chosen
-[ FileName, PathName, FilterIndex ] = uigetfile('*.m', 'Select a co-registered MAT file', fullfile(handles.SourceFolder, '*_TWIST-MM-Spline-Coregistered.mat'));
+[ FileName, PathName, FilterIndex ] = uigetfile('*.mat', 'Select a co-registered MAT file', fullfile(handles.SourceFolder, '*_TWIST-MM-Spline-Coregistered.mat'));
 
 if (FilterIndex == 0)
   return;

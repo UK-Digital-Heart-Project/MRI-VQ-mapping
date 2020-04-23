@@ -117,6 +117,12 @@ if (exist(ScreenshotsFolder, 'dir') ~= 7)
   mkdir(ScreenshotsFolder);
 end
 
+MoviesFolder = fullfile(handles.TargetFolder, 'Movies');
+
+if (exist(MoviesFolder, 'dir') ~= 7)
+  mkdir(MoviesFolder);
+end
+
 % Disable some features which apply only to a genuine data set (not the initial blank placeholder)
 handles.ReviewMapIsPresent = false;
 
@@ -236,8 +242,8 @@ handles.FileNameStub = FileName(1:r);
 % Read in the maps, which are bundled in a structure called Mat, retained to save memory and time
 wb = waitbar(0.5, 'Loading data - please wait ... ');
 
-handles.Mat = [];
-handles.Mat = load(fullfile(PathName, FileName));
+handles.MapMat = [];
+handles.MapMat = load(fullfile(PathName, FileName));
 
 pause(0.5);
 waitbar(1.0, wb, 'Loading complete');
@@ -247,14 +253,71 @@ delete(wb);
 % Update the first read-only edit window with the source filename
 set(handles.MapFileEdit, 'String', sprintf('  Map Pickle File:       %s', handles.SourceFileName));
 
-% Extract the different maps from the data pickle - ignore the MPA ROI
-handles.PBV           = handles.Mat.AllPBV;
-handles.UnfilteredPBV = handles.Mat.UnfilteredAllPBV;
-handles.PBF           = handles.Mat.AllPBF;
-handles.UnfilteredPBF = handles.Mat.UnfilteredAllPBF;
-handles.MTT           = handles.Mat.AllMTT;
-handles.TTP           = handles.Mat.AllTTP;
-handles.Mask          = (handles.TTP > 0);
+% List the fields of the MapMat structure so that maps from different mapping GUI's can be extracted
+handles.RawMapPickleFieldNames = fieldnames(handles.MapMat);
+
+% Compile a directory of those field names which are actually present - this will be used to control the state logic elsewhere
+handles.MapFieldNames = { 'PBV', 'UnfilteredPBV', 'PBF', 'MTT', 'TTP' };
+
+% Extract the different maps from the data pickle which are guaranteed to exist - ignore the MPA ROI
+handles.PBV           = handles.MapMat.AllPBV;
+handles.UnfilteredPBV = handles.MapMat.UnfilteredAllPBV;
+handles.PBF           = handles.MapMat.AllPBF;
+handles.MTT           = handles.MapMat.AllMTT;
+handles.TTP           = handles.MapMat.AllTTP;
+
+% Now look for those that may or may not exist - note that the threshold mask is inferred rather than explicitly present
+if any(strcmpi(handles.RawMapPickleFieldNames, 'AllCC'))
+  handles.CC = handles.MapMat.AllCC;
+  handles.MapFieldNames = horzcat(handles.MapFieldNames, { 'CC' });
+  set(handles.CCRadio, 'Enable', 'on');
+else
+  handles.CC = [];
+  set(handles.CCRadio, 'Enable', 'off');
+end
+
+if any(strcmpi(handles.RawMapPickleFieldNames, 'UnfilteredAllCC'))
+  handles.UnfilteredCC = handles.MapMat.UnfilteredAllCC;
+  handles.MapFieldNames = horzcat(handles.MapFieldNames, { 'UnfilteredCC' });
+  set(handles.UnfilteredCCRadio, 'Enable', 'on');
+else
+  handles.UnfilteredCC = [];
+  set(handles.UnfilteredCCRadio, 'Enable', 'off');
+end
+
+if any(strcmpi(handles.RawMapPickleFieldNames, 'UnfilteredAllPBF'))
+  handles.UnfilteredPBF = handles.MapMat.UnfilteredAllPBF;
+  handles.MapFieldNames = horzcat(handles.MapFieldNames, { 'UnfilteredPBF' });
+  set(handles.UnfilteredPBFRadio, 'Enable', 'on');
+else
+  handles.UnfilteredPBF = [];
+  set(handles.UnfilteredPBFRadio, 'Enable', 'off');
+end
+
+if any(strcmpi(handles.RawMapPickleFieldNames, 'UnfilteredAllMTT'))
+  handles.UnfilteredMTT = handles.MapMat.UnfilteredAllMTT;
+  handles.MapFieldNames = horzcat(handles.MapFieldNames, { 'UnfilteredMTT' });
+  set(handles.UnfilteredMTTRadio, 'Enable', 'on');
+else
+  handles.UnfilteredMTT = [];
+  set(handles.UnfilteredMTTRadio, 'Enable', 'off');
+end
+
+if any(strcmpi(handles.RawMapPickleFieldNames, 'AllIngrischMask'))
+  handles.IngrischMask  = handles.MapMat.AllIngrischMask;
+  handles.Mask          = handles.IngrischMask;
+  handles.MapFieldNames = horzcat(handles.MapFieldNames, { 'IngrischMask' });
+  handles.ThresholdMask = [];
+  set(handles.IngrischMaskRadio, 'Enable', 'on');
+  set(handles.ThresholdMaskRadio, 'Enable', 'off');
+else
+  handles.ThresholdMask = (handles.MapMat.AllTTP > 0);
+  handles.Mask          = handles.ThresholdMask;
+  handles.MapFieldNames = horzcat(handles.MapFieldNames, { 'ThresholdMask' });
+  handles.IngrischMask  = [];
+  set(handles.IngrischMaskRadio, 'Enable', 'off');
+  set(handles.ThresholdMaskRadio, 'Enable', 'on');
+end
 
 % Display the image size
 Dims = size(handles.PBV);
@@ -311,8 +374,26 @@ end
 set(handles.DisplaySliceEdit, 'String', sprintf('  Slice: %3d', handles.Slice));
 set(handles.DisplaySliceSlider, 'Value', handles.Slice);
 
+% If a previously selected "view map" option is unavailable, default to 'PBV'
+if ~any(strcmpi(handles.MapFieldNames, handles.ViewMap))
+  handles.ViewMap = 'PBV';
+  set(handles.PBVRadio, 'Value', true);
+end
+
 % Select the map to be viewed, and set units and scaling factors
 switch handles.ViewMap
+  case 'CC'
+    handles.Map       = handles.CC;
+    handles.Units     = '';
+    handles.CBUnits   = 'Cross-Correlation';
+    handles.Intercept = 0.0;
+    handles.Slope     = 1.0e-4;
+  case 'Unfiltered CC'
+    handles.Map       = handles.UnfilteredCC;
+    handles.Units     = '';
+    handles.CBUnits   = 'Unfiltered Cross-Correlation';
+    handles.Intercept = 0.0;
+    handles.Slope     = 1.0e-4;   
   case 'PBV'
     handles.Map       = handles.PBV;
     handles.Units     = 'ml/100 ml';
@@ -343,15 +424,27 @@ switch handles.ViewMap
     handles.CBUnits   = 'MTT [sec]';
     handles.Intercept = - 10.0;
     handles.Slope     = 0.001;
+  case 'Unfiltered MTT'
+    handles.Map       = handles.UnfilteredMTT;
+    handles.Units     = 'sec';
+    handles.CBUnits   = 'Unfiltered MTT [sec]';
+    handles.Intercept = - 10.0;
+    handles.Slope     = 0.001;
   case 'TTP'
     handles.Map       = handles.TTP;
     handles.Units     = 'sec';
     handles.CBUnits   = 'TTP [sec]';
     handles.Intercept = - 10.0;
     handles.Slope     = 0.001;
-  case 'Processing Mask'
-    handles.Map       = handles.Mask;
-    handles.Units     = 'Mask [Binary Scale]';
+  case 'Threshold Mask'
+    handles.Map       = handles.ThresholdMask;
+    handles.Units     = 'Threshold Mask [Binary Scale]';
+    handles.Intercept = 0.0;
+    handles.Slope     = 1.0;
+  case 'Ingrisch Mask'
+    handles.Map       = handles.IngrischMask;
+    handles.Units    = '';
+    handles.CBUnits   = 'Ingrisch Mask [Binary]';
     handles.Intercept = 0.0;
     handles.Slope     = 1.0;
 end  
@@ -362,13 +455,15 @@ handles.Map = handles.Intercept + handles.Slope*double(handles.Map);
 % Censor high values in the working copy of the displayed map, but leave the original maps alone (so that censorship can be toggled on and off)
 if (handles.CensorHighValues == true)
   switch handles.ViewMap
+    case { 'CC', 'Unfiltered CC' }
+      % Nothing to do here
     case { 'PBV', 'Unfiltered PBV' }
       handles.Map(handles.Map > 100.0) = 0.0;
     case { 'PBF', 'Unfiltered PBF' }
       handles.Map(handles.Map > 6000.0) = 0.0;
-    case { 'MTT', 'TTP' }
+    case { 'MTT', 'Unfiltered MTT', 'TTP' }
       handles.Map(handles.Map > 60.0) = 0.0;
-    case 'Processing Mask'
+    case { 'Threshold Mask', 'Ingrisch Mask' }
       % Nothing to do here
   end
 end    
@@ -998,7 +1093,7 @@ XlsxFileName = fullfile(PathName, FileName);
 
 set(handles.XlsxSummaryFileEdit, 'String', sprintf('  XLSX Summary File:     %s', FileName));
 
-NTABS = 9;
+NTABS = 10;
 
 wb = waitbar(0, 'Saving statistics ...');
 
@@ -1009,8 +1104,8 @@ DV = ST*DR^2;                       % In mm^3
 
 [ NR, NC, NP ] = size(handles.Map);
 
-Head = { 'Rows', 'Column', 'Planes', 'In-plane resolution / mm', 'Slice thickness / mm', 'Volume / mm^3' };
-Data = {  NR,     NC,       NP,       DR,                         ST,                     DV             };
+Head = { 'Rows', 'Columns', 'Planes', 'In-plane resolution / mm', 'Slice thickness / mm', 'Volume / mm^3' };
+Data = {  NR,     NC,        NP,       DR,                         ST,                     DV             };
 Full = vertcat(Head, Data);
 
 xlswrite(XlsxFileName, Full, 'Resolution');
@@ -1214,55 +1309,57 @@ xlswrite(XlsxFileName, Full, 'PBF');
 
 waitbar(double(5)/double(NTABS + 1), wb, sprintf('Saved 5 out of %1d tabs', NTABS));
 
-% Calculate statistics for the unfiltered PBF
-Intercept = 0.0;
-Slope     = 1.0;
+% Calculate statistics for the unfiltered PBF - if it exists
+if ~isempty(handles.UnfilteredPBF)
+  Intercept = 0.0;
+  Slope     = 1.0;
 
-pbf = Intercept + Slope*double(handles.UnfilteredPBF(RightOverlap));
+  pbf = Intercept + Slope*double(handles.UnfilteredPBF(RightOverlap));
 
-if (handles.CensorHighValues == true)
-  pbf(pbf > 6000.0) = 6000.0;
+  if (handles.CensorHighValues == true)
+    pbf(pbf > 6000.0) = 6000.0;
+  end
+
+  RightMu     = mean(pbf);
+  RightMedian = median(pbf);
+  RightSD     = std(pbf);
+  RightMini   = min(pbf);
+  RightMaxi   = max(pbf);
+
+  pbf = Intercept + Slope*double(handles.UnfilteredPBF(LinksOverlap));
+
+  if (handles.CensorHighValues == true)
+    pbf(pbf > 6000.0) = 6000.0;
+  end
+
+  LinksMu     = mean(pbf);
+  LinksMedian = median(pbf);
+  LinksSD     = std(pbf);
+  LinksMini   = min(pbf);
+  LinksMaxi   = max(pbf);
+
+  pbf = Intercept + Slope*double(handles.UnfilteredPBF(TotalOverlap));
+
+  if (handles.CensorHighValues == true)
+    pbf(pbf > 6000.0) = 6000.0;
+  end
+
+  TotalMu     = mean(pbf);
+  TotalMedian = median(pbf);
+  TotalSD     = std(pbf);
+  TotalMini   = min(pbf);
+  TotalMaxi   = max(pbf);
+
+  Head = { 'Right mean unfiltered PBF / (ml/min)/(100 ml)', 'Median',     'S.D.',   'Minimum',  'Maximum', ...
+           'Left mean unfiltered PBF / (ml/min)/(100 ml)',  'Median',     'S.D.',   'Minimum',  'Maximum', ...
+           'Total mean unfiltered PBF / (ml/min)/(100 ml)', 'Median',     'S.D.',   'Minimum',  'Maximum' };
+  Data = {  RightMu,                              RightMedian,  RightSD,  RightMini,  RightMaxi, ...
+            LinksMu,                              LinksMedian,  LinksSD,  LinksMini,  LinksMaxi, ...
+            TotalMu,                              TotalMedian,  TotalSD,  TotalMini,  TotalMaxi };
+  Full = vertcat(Head, Data);
+
+  xlswrite(XlsxFileName, Full, 'Unfiltered PBF');
 end
-
-RightMu     = mean(pbf);
-RightMedian = median(pbf);
-RightSD     = std(pbf);
-RightMini   = min(pbf);
-RightMaxi   = max(pbf);
-
-pbf = Intercept + Slope*double(handles.UnfilteredPBF(LinksOverlap));
-
-if (handles.CensorHighValues == true)
-  pbf(pbf > 6000.0) = 6000.0;
-end
-
-LinksMu     = mean(pbf);
-LinksMedian = median(pbf);
-LinksSD     = std(pbf);
-LinksMini   = min(pbf);
-LinksMaxi   = max(pbf);
-
-pbf = Intercept + Slope*double(handles.UnfilteredPBF(TotalOverlap));
-
-if (handles.CensorHighValues == true)
-  pbf(pbf > 6000.0) = 6000.0;
-end
-
-TotalMu     = mean(pbf);
-TotalMedian = median(pbf);
-TotalSD     = std(pbf);
-TotalMini   = min(pbf);
-TotalMaxi   = max(pbf);
-
-Head = { 'Right mean unfiltered PBF / (ml/min)/(100 ml)', 'Median',     'S.D.',   'Minimum',  'Maximum', ...
-         'Left mean unfiltered PBF / (ml/min)/(100 ml)',  'Median',     'S.D.',   'Minimum',  'Maximum', ...
-         'Total mean unfiltered PBF / (ml/min)/(100 ml)', 'Median',     'S.D.',   'Minimum',  'Maximum' };
-Data = {  RightMu,                              RightMedian,  RightSD,  RightMini,  RightMaxi, ...
-          LinksMu,                              LinksMedian,  LinksSD,  LinksMini,  LinksMaxi, ...
-          TotalMu,                              TotalMedian,  TotalSD,  TotalMini,  TotalMaxi };
-Full = vertcat(Head, Data);
-
-xlswrite(XlsxFileName, Full, 'Unfiltered PBF');
 
 waitbar(double(6)/double(NTABS + 1), wb, sprintf('Saved 6 out of %1d tabs', NTABS));
 
@@ -1324,6 +1421,66 @@ xlswrite(XlsxFileName, Full, 'MTT');
 
 waitbar(double(7)/double(NTABS + 1), wb, sprintf('Saved 7 out of %1d tabs', NTABS));
 
+% Calculate statistics for the unfiltered MTT - if it exists
+if ~isempty(handles.UnfilteredMTT)
+  Intercept = - 10.0;
+  Slope     = 0.001;
+
+  mtt = Intercept + Slope*double(handles.UnfilteredMTT(RightOverlap));
+
+  mtt(mtt < 0.0) = 0.0;
+
+  if (handles.CensorHighValues == true)
+    mtt(mtt > 60.0) = 60.0;
+  end
+
+  RightMu     = mean(mtt);
+  RightMedian = median(mtt);
+  RightSD     = std(mtt);
+  RightMini   = min(mtt);
+  RightMaxi   = max(mtt);
+
+  mtt = Intercept + Slope*double(handles.UnfilteredMTT(LinksOverlap));
+
+  mtt(mtt < 0.0) = 0.0;
+
+  if (handles.CensorHighValues == true)
+    mtt(mtt > 60.0) = 60.0;
+  end
+
+  LinksMu     = mean(mtt);
+  LinksMedian = median(mtt);
+  LinksSD     = std(mtt);
+  LinksMini   = min(mtt);
+  LinksMaxi   = max(mtt);
+
+  mtt = Intercept + Slope*double(handles.UnfilteredMTT(TotalOverlap));
+
+  mtt(mtt < 0.0) = 0.0;
+
+  if (handles.CensorHighValues == true)
+    mtt(mtt > 60.0) = 60.0;
+  end
+
+  TotalMu     = mean(mtt);
+  TotalMedian = median(mtt);
+  TotalSD     = std(mtt);
+  TotalMini   = min(mtt);
+  TotalMaxi   = max(mtt);
+
+  Head = { 'Right mean unfiltered MTT / sec', 'Median',     'S.D.',   'Minimum',  'Maximum', ...
+           'Left mean unfiltered MTT / sec',  'Median',     'S.D.',   'Minimum',  'Maximum', ...
+           'Total mean unfiltered MTT / sec', 'Median',     'S.D.',   'Minimum',  'Maximum' };
+  Data = {  RightMu,                           RightMedian,  RightSD,  RightMini,  RightMaxi, ...
+            LinksMu,                           LinksMedian,  LinksSD,  LinksMini,  LinksMaxi, ...
+            TotalMu,                           TotalMedian,  TotalSD,  TotalMini,  TotalMaxi };
+  Full = vertcat(Head, Data);
+
+  xlswrite(XlsxFileName, Full, 'Unfiltered MTT');
+end
+
+waitbar(double(8)/double(NTABS + 1), wb, sprintf('Saved 8 out of %1d tabs', NTABS));
+
 % Calculate statistics for the TTP
 Intercept = - 10.0;
 Slope     = 0.001;
@@ -1380,7 +1537,7 @@ Full = vertcat(Head, Data);
 
 xlswrite(XlsxFileName, Full, 'TTP');
 
-waitbar(double(8)/double(NTABS + 1), wb, sprintf('Saved 8 out of %1d tabs', NTABS));
+waitbar(double(9)/double(NTABS + 1), wb, sprintf('Saved 9 out of %1d tabs', NTABS));
 
 % Note any data censorship
 if (handles.CensorHighValues == true)
@@ -1395,7 +1552,7 @@ Full = vertcat(Head, Data);
 
 xlswrite(XlsxFileName, Full, 'Censorship');
 
-waitbar(double(9)/double(NTABS + 1), wb, sprintf('Saved 9 out of %1d tabs', NTABS));
+waitbar(double(10)/double(NTABS + 1), wb, sprintf('Saved 10 out of %1d tabs', NTABS));
 
 % Quit gracefully
 pause(0.5);
@@ -1423,6 +1580,18 @@ end
 
 % Select the map to be viewed, and set units and scaling factors
 switch handles.ViewMap
+  case 'CC'
+    handles.Map       = handles.CC;
+    handles.Units     = '';
+    handles.CBUnits   = 'Cross-Correlation';
+    handles.Intercept = 0.0;
+    handles.Slope     = 1.0e-4;
+  case 'Unfiltered CC'
+    handles.Map       = handles.UnfilteredCC;
+    handles.Units     = '';
+    handles.CBUnits   = 'Unfiltered Cross-Correlation';
+    handles.Intercept = 0.0;
+    handles.Slope     = 1.0e-4;   
   case 'PBV'
     handles.Map       = handles.PBV;
     handles.Units     = 'ml/100 ml';
@@ -1453,15 +1622,26 @@ switch handles.ViewMap
     handles.CBUnits   = 'MTT [sec]';
     handles.Intercept = - 10.0;
     handles.Slope     = 0.001;
+  case 'Unfiltered MTT'
+    handles.Map       = handles.MTT;
+    handles.Units     = 'sec';
+    handles.CBUnits   = 'Unfiltered MTT [sec]';
+    handles.Intercept = - 10.0;
+    handles.Slope     = 0.001;
   case 'TTP'
     handles.Map       = handles.TTP;
     handles.Units     = 'sec';
     handles.CBUnits   = 'TTP [sec]';
     handles.Intercept = - 10.0;
     handles.Slope     = 0.001;
-  case 'Processing Mask'
-    handles.Map       = handles.Mask;
-    handles.Units     = 'Mask [Binary Scale]';
+  case 'Threshold Mask'
+    handles.Map       = handles.ThresholdMask;
+    handles.Units     = 'Threshold Mask [Binary Scale]';
+    handles.Intercept = 0.0;
+    handles.Slope     = 1.0;
+  case 'Ingrisch Mask'
+    handles.Map       = handles.IngrischMask;
+    handles.Units     = 'Ingrisch Mask [Binary Scale]';
     handles.Intercept = 0.0;
     handles.Slope     = 1.0;
 end  
@@ -1471,13 +1651,15 @@ handles.Map = handles.Intercept + handles.Slope*double(handles.Map);
 
 if (handles.CensorHighValues == true)
   switch handles.ViewMap
+    case { 'CC', 'Unfiltered CC' }
+      % Nothing to do here
     case { 'PBV', 'Unfiltered PBV' }
       handles.Map(handles.Map > 100.0) = 0.0;
     case { 'PBF', 'Unfiltered PBF' }
       handles.Map(handles.Map > 6000.0) = 0.0;
-    case { 'MTT', 'TTP' }
+    case { 'MTT', 'Unfiltered MTT', 'TTP' }
       handles.Map(handles.Map > 60.0) = 0.0;
-    case 'Processing Mask'
+    case { 'Threshold Mask', 'Ingrisch Mask' }
       % Nothing to do here
   end
 end  
@@ -1523,6 +1705,18 @@ end
 
 % Select the map to be viewed, and set units and scaling factors
 switch handles.ViewMap
+  case 'CC'
+    handles.Map       = handles.CC;
+    handles.Units     = '';
+    handles.CBUnits   = 'Cross-Correlation';
+    handles.Intercept = 0.0;
+    handles.Slope     = 1.0e-4;
+  case 'Unfiltered CC'
+    handles.Map       = handles.UnfilteredCC;
+    handles.Units     = '';
+    handles.CBUnits   = 'Unfiltered Cross-Correlation';
+    handles.Intercept = 0.0;
+    handles.Slope     = 1.0e-4;   
   case 'PBV'
     handles.Map       = handles.PBV;
     handles.Units     = 'ml/100 ml';
@@ -1553,31 +1747,45 @@ switch handles.ViewMap
     handles.CBUnits   = 'MTT [sec]';
     handles.Intercept = - 10.0;
     handles.Slope     = 0.001;
+  case 'Unfiltered MTT'
+    handles.Map       = handles.UnfilteredMTT;
+    handles.Units     = 'sec';
+    handles.CBUnits   = 'Unfiltered MTT [sec]';
+    handles.Intercept = - 10.0;
+    handles.Slope     = 0.001;
   case 'TTP'
     handles.Map       = handles.TTP;
     handles.Units     = 'sec';
     handles.CBUnits   = 'TTP [sec]';
     handles.Intercept = - 10.0;
     handles.Slope     = 0.001;
-  case 'Processing Mask'
-    handles.Map       = handles.Mask;
-    handles.Units     = 'Mask [Binary Scale]';
+  case 'Threshold Mask'
+    handles.Map       = handles.ThresholdMask;
+    handles.Units     = 'Threshold Mask [Binary Scale]';
     handles.Intercept = 0.0;
     handles.Slope     = 1.0;
-end       
+  case 'Ingrisch Mask'
+    handles.Map       = handles.IngrischMask;
+    handles.Units    = '';
+    handles.CBUnits   = 'Ingrisch Mask [Binary]';
+    handles.Intercept = 0.0;
+    handles.Slope     = 1.0;
+end      
 
 % Rescale the data for floating-point display
 handles.Map = handles.Intercept + handles.Slope*double(handles.Map);
 
 if (handles.CensorHighValues == true)
   switch handles.ViewMap
+    case { 'CC', 'Unfiltered CC' }
+      % Nothing to do here
     case { 'PBV', 'Unfiltered PBV' }
       handles.Map(handles.Map > 100.0) = 0.0;
     case { 'PBF', 'Unfiltered PBF' }
       handles.Map(handles.Map > 6000.0) = 0.0;
-    case { 'MTT', 'TTP' }
+    case { 'MTT', 'Unfiltered MTT', 'TTP' }
       handles.Map(handles.Map > 60.0) = 0.0;
-    case 'Processing Mask'
+    case { 'Threshold Mask', 'Ingrisch Mask' }
       % Nothing to do here
   end
 end  
@@ -1852,13 +2060,17 @@ set(handles.DisplayFloorSlider, 'Enable', 'off');
 set(handles.DisplaySliceSlider, 'Enable', 'off');
 
 % The Display Menu controls - note that "Import Maps" will always be disabled in Segmentation mode
+set(handles.CCRadio, 'Enable', 'off');
+set(handles.UnfilteredCCRadio, 'Enable', 'off');
 set(handles.PBVRadio, 'Enable', 'off');
 set(handles.UnfilteredPBVRadio, 'Enable', 'off');
 set(handles.PBFRadio, 'Enable', 'off');
 set(handles.UnfilteredPBFRadio, 'Enable', 'off');
 set(handles.MTTRadio, 'Enable', 'off');
+set(handles.UnfilteredMTTRadio, 'Enable', 'off');
 set(handles.TTPRadio, 'Enable', 'off');
-set(handles.ProcessingMaskRadio, 'Enable', 'off');
+set(handles.ThresholdMaskRadio, 'Enable', 'off');
+set(handles.IngrischMaskRadio, 'Enable', 'off');
 
 set(handles.CensorHighValuesCheck, 'Enable', 'off');
 set(handles.CaptureDisplayButton, 'Enable', 'off');
@@ -1898,13 +2110,50 @@ set(handles.DisplayFloorSlider, 'Enable', 'on');
 set(handles.DisplaySliceSlider, 'Enable', 'on');
 
 % The Display Menu controls - note that "Import Maps" will always be disabled in Segmentation mode
+set(handles.CCRadio, 'Enable', 'on');
+set(handles.UnfilteredCCRadio, 'Enable', 'on');
 set(handles.PBVRadio, 'Enable', 'on');
 set(handles.UnfilteredPBVRadio, 'Enable', 'on');
 set(handles.PBFRadio, 'Enable', 'on');
 set(handles.UnfilteredPBFRadio, 'Enable', 'on');
 set(handles.MTTRadio, 'Enable', 'on');
+set(handles.UnfilteredMTTRadio, 'Enable', 'on');
 set(handles.TTPRadio, 'Enable', 'on');
-set(handles.ProcessingMaskRadio, 'Enable', 'on');
+set(handles.ThresholdMaskRadio, 'Enable', 'on');
+set(handles.IngrischMaskRadio, 'Enable', 'on');
+
+% Now look for those that may or may not exist - note that the threshold mask is inferred rather than explicitly present
+if any(strcmpi(handles.RawMapPickleFieldNames, 'AllCC'))
+  set(handles.CCRadio, 'Enable', 'on');
+else
+  set(handles.CCRadio, 'Enable', 'off');
+end
+
+if any(strcmpi(handles.RawMapPickleFieldNames, 'UnfilteredAllCC'))
+  set(handles.UnfilteredCCRadio, 'Enable', 'on');
+else
+  set(handles.UnfilteredCCRadio, 'Enable', 'off');
+end
+
+if any(strcmpi(handles.RawMapPickleFieldNames, 'UnfilteredAllPBF'))
+  set(handles.UnfilteredPBFRadio, 'Enable', 'on');
+else
+  set(handles.UnfilteredPBFRadio, 'Enable', 'off');
+end
+
+if any(strcmpi(handles.RawMapPickleFieldNames, 'UnfilteredAllMTT'))
+  set(handles.UnfilteredMTTRadio, 'Enable', 'on');
+else
+  set(handles.UnfilteredMTTRadio, 'Enable', 'off');
+end    
+
+if any(strcmpi(handles.RawMapPickleFieldNames, 'AllIngrischMask'))
+  set(handles.ThresholdMaskRadio, 'Enable', 'off');
+  set(handles.IngrischMaskRadio, 'Enable', 'on');
+else
+  set(handles.ThresholdMaskRadio, 'Enable', 'on');
+  set(handles.IngrischMaskRadio, 'Enable', 'off');
+end
 
 set(handles.CensorHighValuesCheck, 'Enable', 'on');
 set(handles.CaptureDisplayButton, 'Enable', 'on');
@@ -1977,11 +2226,13 @@ if strcmpi(handles.ProgramState, 'Segment') && (handles.SegmentationInProgress =
   
   if any(handles.TotalROI(:))
     switch handles.ViewMap
+      case { 'CC', 'Unfiltered CC' }
+        handles.Data(~handles.TotalROI) = 0.0;
       case { 'PBV', 'Unfiltered PBV', 'PBF', 'Unfiltered PBF' }
         handles.Data(~handles.TotalROI) = 0.0;
-      case { 'MTT', 'TTP' } 
+      case { 'MTT', 'Unfiltered MTT', 'TTP' } 
         handles.Data(~handles.TotalROI) = - 10.0;
-      case 'Processing Mask'
+      case { 'Threshold Mask', 'Ingrisch Mask' }
         handles.Data(~handles.TotalROI) = 0.0;
     end
   end

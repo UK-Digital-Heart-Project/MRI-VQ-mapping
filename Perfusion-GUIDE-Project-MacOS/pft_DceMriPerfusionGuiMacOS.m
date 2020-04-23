@@ -337,7 +337,7 @@ end
 function OpenCineStackButton_Callback(hObject, eventdata, handles)
 
 % Prompt for a MAT file - do nothing if none is chosen
-[ FileName, PathName, FilterIndex ] = uigetfile('*.m', 'Select a perfusion MAT file', fullfile(handles.SourceFolder, '*mat'));
+[ FileName, PathName, FilterIndex ] = uigetfile('*.mat', 'Select a perfusion MAT file', fullfile(handles.SourceFolder, '*mat'));
 
 if (FilterIndex == 0)
   return;

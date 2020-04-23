@@ -1247,14 +1247,14 @@ end
 function ImportDataButton_Callback(hObject, eventdata, handles)
   
 % Prompt for a perfusion map MAT file - do nothing if none is chosen
-[ MapFileName, MapPathName, FilterIndex ] = uigetfile('*.m', 'Select a PERFUSION MAP pickle file', fullfile(handles.MappingFolder, '*mat'));
+[ MapFileName, MapPathName, FilterIndex ] = uigetfile('*.mat', 'Select a PERFUSION MAP pickle file', fullfile(handles.MappingFolder, '*mat'));
 
 if (FilterIndex == 0)
   return;
 end
 
 % Prompt for a grayscale pickle file - do nothing if none is chosen
-[ GrayscaleFileName, GrayscalePathName, FilterIndex ] = uigetfile('*.m', 'Select a GRAYSCALE pickle file', fullfile(handles.GrayscaleFolder, '*mat'));
+[ GrayscaleFileName, GrayscalePathName, FilterIndex ] = uigetfile('*.mat', 'Select a GRAYSCALE pickle file', fullfile(handles.GrayscaleFolder, '*mat'));
 
 if (FilterIndex == 0)
   return;

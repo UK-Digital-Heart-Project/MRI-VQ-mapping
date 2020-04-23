@@ -126,7 +126,7 @@ In the folder ```Perfusion-GUIDE-Project-Hybrid-MacOS```, use the function ```pf
 ## Segmentation and Quantitation
 A simple GUI allows manual segmentation of the lungs from previously created perfusion maps.
 
-Statitistics may then be saved to an XLSX file. The 9 tabs provide information on:
+Statitistics may then be saved to an XLSX file. Up to 10 tabs provide information on:
 
 - Data dimensions and resolution.
 - Voxel counts and volumes in the segmented regions, including deficit fractions (volumes where no significant perfusion was observed).
@@ -135,12 +135,21 @@ Statitistics may then be saved to an XLSX file. The 9 tabs provide information o
 - PBF.
 - Unfiltered PBF.
 - MTT.
+- Unfiltered MTT.
 - TTP.
 - Data censorship.
 
 Results are grouped together for the right lung, left lung, and the combined region.
 
 The interface is straightforward and the outputs are self-explanatory.
+
+The GUI has been generalised to accept inputs from Mark 1 Mapping, Mark 2 Ingrisch and Mark 3 Hybrid workflows.
+
+```This GUI was created using MATLAB 2015aSP1, and may not work correctly with earlier or later versions.```
+
+## Segmentation and Quantitation for MacOS
+
+Outputs are written to a single-page CSV file rather than a multi-tab XLSX; results can be straightforwardly transcribed at a later stage.
 
 ```This GUI was created using MATLAB 2015aSP1, and may not work correctly with earlier or later versions.```
 

@@ -45,6 +45,13 @@ Be sure to initialise the text files ```Source-Folder.txt``` and ```Target-Folde
 
 ```This MATLAB GUIDE application was created with MATLAB 2017b.```
 
+## Co-Registration Review for MacOS
+The functionality is the same as for the generic release; this build has been tailored to a local MacOS machine with a dual monitor display.
+
+The active function here is ```pft_PerfusionCoregistrationReviewMacOS.m```.
+
+```This MATLAB GUIDE application was created with MATLAB 2017b.```
+
 ## Perfusion Mapping
 Perfusion maps are created from the initial "pickle" files.
 

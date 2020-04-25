@@ -223,7 +223,7 @@ end
 function ImportMapsButton_Callback(hObject, eventdata, handles)
 
 % Prompt for a MAT file - do nothing if none is chosen
-[ FileName, PathName, FilterIndex ] = uigetfile('*.mat', 'Select a perfusion MAT file', fullfile(handles.SourceFolder, '*mat'));
+[ FileName, PathName, FilterIndex ] = pft_uigetfile('*.mat', 'Select a perfusion MAT file', fullfile(handles.SourceFolder, '*mat'));
 
 if (FilterIndex == 0)
   guidata(hObject, handles);
@@ -969,7 +969,7 @@ end
 FilterSpec  = fullfile(handles.TargetFolder, 'MacOS-Screenshots', '*.png');
 DialogTitle = 'Save Screenshot As';
 
-[ FileName, PathName, FilterIndex ] = uiputfile(FilterSpec, DialogTitle, DefaultName);
+[ FileName, PathName, FilterIndex ] = pft_uiputfile(FilterSpec, DialogTitle, DefaultName);
 
 % Quit if the user selects Cancel
 if (FilterIndex == 0)
@@ -1080,7 +1080,7 @@ end
 FilterSpec  = fullfile(handles.TargetFolder, 'MacOS-Quantitation', '*.csv');
 DialogTitle = 'Save Statistics To';
 
-[ FileName, PathName, FilterIndex ] = uiputfile(FilterSpec, DialogTitle, DefaultName);
+[ FileName, PathName, FilterIndex ] = pft_uiputfile(FilterSpec, DialogTitle, DefaultName);
 
 % Quit if no file is chosen
 if (FilterIndex == 0)
@@ -2420,7 +2420,7 @@ end
 FilterSpec  = fullfile(handles.TargetFolder, 'MacOS-Movies', '*.avi');
 DialogTitle = 'Save Movie As';
 
-[ FileName, PathName, FilterIndex ] = uiputfile(FilterSpec, DialogTitle, DefaultName);
+[ FileName, PathName, FilterIndex ] = pft_uiputfile(FilterSpec, DialogTitle, DefaultName);
 
 % Return if no file is chosen
 if (FilterIndex == 0)

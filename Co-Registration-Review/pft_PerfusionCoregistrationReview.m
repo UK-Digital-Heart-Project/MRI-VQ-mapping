@@ -166,7 +166,7 @@ end
 function ImportCineStacksButton_Callback(hObject, eventdata, handles)
 
 % Prompt for a MAT file - do nothing if none is chosen
-[ FileName, PathName, FilterIndex ] = uigetfile('*.mat', 'Select a co-registered MAT file', fullfile(handles.SourceFolder, '*_TWIST-MM-Spline-Coregistered.mat'));
+[ FileName, PathName, FilterIndex ] = pft_uigetfile('*.mat', 'Select a co-registered MAT file', fullfile(handles.SourceFolder, '*_TWIST-MM-Spline-Coregistered.mat'));
 
 if (FilterIndex == 0)
   return;
@@ -778,7 +778,7 @@ end
 FilterSpec  = fullfile(handles.TargetFolder, '*.png');
 DialogTitle = 'Save Screenshot As';
 
-[ FileName, PathName, FilterIndex ] = uiputfile(FilterSpec, DialogTitle, DefaultName);
+[ FileName, PathName, FilterIndex ] = pft_uiputfile(FilterSpec, DialogTitle, DefaultName);
 
 if (FilterIndex ~= 0)
   wb = waitbar(0.5, 'Exporting figure ... ');  

@@ -241,7 +241,7 @@ end
 function OpenCineStackButton_Callback(hObject, eventdata, handles)
 
 % Prompt for a MAT file - do nothing if none is chosen
-[ FileName, PathName, FilterIndex ] = uigetfile('*.mat', 'Select a perfusion MAT file', fullfile(handles.SourceFolder, '*mat'));
+[ FileName, PathName, FilterIndex ] = pft_uigetfile('*.mat', 'Select a perfusion MAT file', fullfile(handles.SourceFolder, '*mat'));
 
 if (FilterIndex == 0)
   return;
@@ -942,7 +942,7 @@ end
 FilterSpec  = fullfile(handles.TargetFolder, 'Screenshots', '*.png');
 DialogTitle = 'Save Screenshot As';
 
-[ FileName, PathName, FilterIndex ] = uiputfile(FilterSpec, DialogTitle, DefaultName);
+[ FileName, PathName, FilterIndex ] = pft_uiputfile(FilterSpec, DialogTitle, DefaultName);
 
 if (FilterIndex ~= 0)
   wb = waitbar(0.5, 'Exporting screenshot ... ');  
@@ -1571,7 +1571,7 @@ end
 function SelectROIFolderButton_Callback(hObject, eventdata, handles)
 
 % Prompt for the parent folder of the left and right lung directories - quit silently on Cancel
-Folder = uigetdir(fullfile(handles.TargetFolder, 'Regions of Interest'), 'Parent folder for right and left lung ROI''s');
+Folder = pft_uigetdir(fullfile(handles.TargetFolder, 'Regions of Interest'), 'Parent folder for right and left lung ROI''s');
 
 if ~ischar(Folder)
   return;

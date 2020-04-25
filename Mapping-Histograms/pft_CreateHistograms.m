@@ -22,7 +22,7 @@ fclose(fid);
 
 %% Prompt for a pickle file of perfusion maps
 
-[ FileName, PathName, FilterIndex ] = uigetfile(fullfile(MappingParentFolder, '*.mat'), 'Select a mapped pickle file');
+[ FileName, PathName, FilterIndex ] = pft_uigetfile(fullfile(MappingParentFolder, '*.mat'), 'Select a mapped pickle file');
 
 if (FilterIndex == 0)
   h = msgbox('No file selected', 'Quitting', 'modal');
@@ -35,7 +35,7 @@ PickleFileName = fullfile(PathName, FileName);
 
 %% Prompt for the folder of left and right lung segmentations
 
-SegmentationFolder = uigetdir(SegmentationParentFolder, 'Select the segmentation folder');
+SegmentationFolder = pft_uigetdir(SegmentationParentFolder, 'Select the segmentation folder');
 
 if ~ischar(SegmentationFolder)
   h = msgbox('No folder selected', 'Quitting', 'modal');

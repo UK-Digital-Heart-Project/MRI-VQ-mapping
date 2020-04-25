@@ -803,7 +803,7 @@ end
 FilterSpec  = fullfile(handles.SegmentationFolder, 'Screenshots', '*.png');
 DialogTitle = 'Save Screenshot As';
 
-[ FileName, PathName, FilterIndex ] = uiputfile(FilterSpec, DialogTitle, DefaultName);
+[ FileName, PathName, FilterIndex ] = pft_uiputfile(FilterSpec, DialogTitle, DefaultName);
 
 if (FilterIndex ~= 0)
   % Disable the motion function and hide the main controls
@@ -1255,14 +1255,14 @@ end
 function ImportDataButton_Callback(hObject, eventdata, handles)
   
 % Prompt for a perfusion map MAT file - do nothing if none is chosen
-[ MapFileName, MapPathName, FilterIndex ] = uigetfile('*.mat', 'Select a PERFUSION MAP pickle file', fullfile(handles.MappingFolder, '*mat'));
+[ MapFileName, MapPathName, FilterIndex ] = pft_uigetfile('*.mat', 'Select a PERFUSION MAP pickle file', fullfile(handles.MappingFolder, '*mat'));
 
 if (FilterIndex == 0)
   return;
 end
 
 % Prompt for a grayscale pickle file - do nothing if none is chosen
-[ GrayscaleFileName, GrayscalePathName, FilterIndex ] = uigetfile('*.mat', 'Select a GRAYSCALE pickle file', fullfile(handles.GrayscaleFolder, '*mat'));
+[ GrayscaleFileName, GrayscalePathName, FilterIndex ] = pft_uigetfile('*.mat', 'Select a GRAYSCALE pickle file', fullfile(handles.GrayscaleFolder, '*mat'));
 
 if (FilterIndex == 0)
   return;
@@ -1789,7 +1789,7 @@ end
 FilterSpec  = fullfile(handles.SegmentationFolder, 'Movies', '*.avi');
 DialogTitle = 'Save Movie As';
 
-[ FileName, PathName, FilterIndex ] = uiputfile(FilterSpec, DialogTitle, DefaultName);
+[ FileName, PathName, FilterIndex ] = pft_uiputfile(FilterSpec, DialogTitle, DefaultName);
 
 % Return if no file is chosen
 if (FilterIndex == 0)

@@ -337,7 +337,7 @@ end
 function OpenCineStackButton_Callback(hObject, eventdata, handles)
 
 % Prompt for a MAT file - do nothing if none is chosen
-[ FileName, PathName, FilterIndex ] = uigetfile('*.mat', 'Select a perfusion MAT file', fullfile(handles.SourceFolder, '*mat'));
+[ FileName, PathName, FilterIndex ] = pft_uigetfile('*.mat', 'Select a perfusion MAT file', fullfile(handles.SourceFolder, '*mat'));
 
 if (FilterIndex == 0)
   return;
@@ -2735,7 +2735,7 @@ end
 FilterSpec  = fullfile(handles.TargetFolder, 'Screenshots', '*.png');
 DialogTitle = 'Save Screenshot As';
 
-[ FileName, PathName, FilterIndex ] = uiputfile(FilterSpec, DialogTitle, DefaultName);
+[ FileName, PathName, FilterIndex ] = pft_uiputfile(FilterSpec, DialogTitle, DefaultName);
 
 if (FilterIndex ~= 0)
   wb = waitbar(0, 'Exporting axes ... ');  
@@ -3046,7 +3046,7 @@ end
 FilterSpec  = fullfile(handles.TargetFolder, 'Mapping', '*.xlsx');
 DialogTitle = 'Save Parameters In File';
 
-[ FileName, PathName, FilterIndex ] = uiputfile(FilterSpec, DialogTitle, DefaultName);
+[ FileName, PathName, FilterIndex ] = pft_uiputfile(FilterSpec, DialogTitle, DefaultName);
 
 % Quit if no file has been selected
 if (FilterIndex == 0)

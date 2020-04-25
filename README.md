@@ -240,7 +240,7 @@ calculated by a later version of the mapping GUI.
 ```This MATLAB GUIDE application was created with MATLAB 2017b. Graphics may appear slightly different in earlier or later versions.```
 
 ## Create Overlays for MacOS
-A version created to overcome problems with a dual monitor system on a Mac.
+A version created to overcome problems with a dual monitor system on an Apple Mac.
 
 Run the function ```pft_CreatePerfusionOverlaysMacOS```.
 

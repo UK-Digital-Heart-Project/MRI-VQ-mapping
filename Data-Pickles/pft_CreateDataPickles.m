@@ -14,7 +14,7 @@ fclose(fid);
 
 %% Select one or more study folders from underneath
 
-SubFolders = uigetfile_n_dir(TopLevelFolder, 'Select study folders to pickle');
+SubFolders = pft_uigetfile_n_dir(TopLevelFolder, 'Select study folders to pickle');
 
 if isempty(SubFolders)
   h = msgbox('No folders selected', 'Exit', 'modal');

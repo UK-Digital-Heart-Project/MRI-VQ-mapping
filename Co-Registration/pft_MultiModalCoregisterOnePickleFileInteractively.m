@@ -6,7 +6,7 @@ TopLevelFolder = fgetl(fid);
 fclose(fid);
 
 % Prompt for a pickle file - but exit if none is chosen
-[FileName, PathName, FilterIndex] = uigetfile(fullfile(TopLevelFolder, '*.mat'), 'Select a pickle file', TopLevelFolder);
+[FileName, PathName, FilterIndex] = pft_uigetfile(fullfile(TopLevelFolder, '*.mat'), 'Select a pickle file', TopLevelFolder);
 
 if (FilterIndex == 0)
   h = msgbox('No file chosen', 'Exit', 'modal');

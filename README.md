@@ -183,14 +183,17 @@ The name of the output folder matches that of the segmentation folder.
 Histograms are created for the right and left lungs, both separately and together, for the following parameters:
 
 - PBV.
-- Unfiltered PBV.
+- Unfiltered PBV (if present).
 - PBF.
-- Unfiltered PBF.
+- Unfiltered PBF (if present).
 - MTT.
+- Unfiltered MTT (if present).
 - TTP.
 
 Graphs are stored in several formats - for use with further software downstream - and there are several PDF compilations,
 including one with a heavily decorated name to indicate the source of the data.
+
+This script should work for results from any mapping workflow, and on any platform.
 
 ```This script was created using MATLAB 2017b; use with earlier or later versions may alter the appearance of the graphs produced.```
 
@@ -246,3 +249,16 @@ Run the function ```pft_CreatePerfusionOverlaysMacOS```.
 
 ```This MATLAB GUIDE application was created with MATLAB 2017b. Graphics may appear slightly different in earlier or later versions.```
 
+## Update Excel Files
+House-keeping scripts for use on MS Windows only.
+
+Browse to the folder ```Main-Scripts``` after placing the main folder and all of its sub-folders on the MATLAB path.
+
+For each workflow (Mark 1 Mapping, Ingrisch, Hybrid), there are two scripts; these collate respectively:
+
+- The mapping parameters for each processing of a given data pickle;
+- The quantitative results following manual segmentation.
+
+As usual, the local TXT files need to be maintained to point to the appropriate folders on the user's local machine.
+
+```This MATLAB GUIDE application was created with MATLAB 2017b, although this consideration is probably not critical.```

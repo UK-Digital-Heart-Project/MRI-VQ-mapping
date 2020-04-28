@@ -22,7 +22,7 @@ fclose(fid);
 
 %% Prompt for a pickle file of perfusion maps
 
-[ FileName, PathName, FilterIndex ] = pft_uigetfile(fullfile(MappingParentFolder, '*.mat'), 'Select a mapped pickle file');
+[ FileName, PathName, FilterIndex ] = pft_uigetfile('*.mat', 'Select a mapped pickle file', fullfile(MappingParentFolder, '*.mat'));
 
 if (FilterIndex == 0)
   h = msgbox('No file selected', 'Quitting', 'modal');
@@ -58,18 +58,24 @@ if (exist(HistogramFolder, 'dir') ~= 7)
   mkdir(HistogramFolder);
 end
 
-%% Load the data from the picke file
+%% Load the data from the picke file and list the filed names
 
 s = load(PickleFileName);
 
 Dims = size(s.AllPBV);
 
-%% Load the binary masks
+FieldNames = fieldnames(s);
+
+%% Load the binary masks - distinguish between the Mark 1 mapping and Hybrid cases, on the one hand, and Ingrisch on the other
 
 RightFolder = fullfile(SegmentationFolder, 'Right Lung');
 LinksFolder = fullfile(SegmentationFolder, 'Left Lung');
 
-ProcessedMask = (s.AllTTP > 0);
+if any(strcmpi(FieldNames, 'AllIngrischMask'))
+  ProcessedMask = s.AllIngrischMask;
+else
+  ProcessedMask = (s.AllTTP > 0);
+end
 
 RightBinaryMask = pft_ReadBinaryMaskStack(RightFolder, Dims);
 LinksBinaryMask = pft_ReadBinaryMaskStack(LinksFolder, Dims);
@@ -226,55 +232,57 @@ pause(1.0);
 
 append_pdfs(Vier, Zwei, Drei);
 
-%% Create 3 histograms together with a common y-limit for the unfiltered PBF
+%% Create 3 histograms together with a common y-limit for the unfiltered PBF - if it exists
 
-Slope	  = 1.0;
-Intercept =	0.0;
+if any(strcmpi(FieldNames, 'UnfilteredAllPBF'))
+  Slope	  = 1.0;
+  Intercept =	0.0;
 
-Edges = 5.0*(0:200)';
+  Edges = 5.0*(0:200)';
 
-pbf = Intercept + Slope*double(s.UnfilteredAllPBF(RightBinaryMask & ProcessedMask));
-[ NRight, Edges ] = histcounts(pbf, Edges);
+  pbf = Intercept + Slope*double(s.UnfilteredAllPBF(RightBinaryMask & ProcessedMask));
+  [ NRight, Edges ] = histcounts(pbf, Edges);
 
-pbf = Intercept + Slope*double(s.UnfilteredAllPBF(LinksBinaryMask & ProcessedMask));
-[ NLinks, Edges ] = histcounts(pbf, Edges);
+  pbf = Intercept + Slope*double(s.UnfilteredAllPBF(LinksBinaryMask & ProcessedMask));
+  [ NLinks, Edges ] = histcounts(pbf, Edges);
 
-pbf = Intercept + Slope*double(s.UnfilteredAllPBF(TotalBinaryMask & ProcessedMask));
-[ NTotal, Edges ] = histcounts(pbf, Edges);
+  pbf = Intercept + Slope*double(s.UnfilteredAllPBF(TotalBinaryMask & ProcessedMask));
+  [ NTotal, Edges ] = histcounts(pbf, Edges);
 
-NMax = max([max(NRight), max(NLinks), max(NTotal)]);
-NMax = 5000.0*ceil(double(NMax)/5000.0);
+  NMax = max([max(NRight), max(NLinks), max(NTotal)]);
+  NMax = 5000.0*ceil(double(NMax)/5000.0);
 
-XLabel = 'Unfiltered PBF [(ml/min)/100 ml]';
-YLabel = 'Voxel Count';
+  XLabel = 'Unfiltered PBF [(ml/min)/100 ml]';
+  YLabel = 'Voxel Count';
 
-Title = 'Unfiltered PBF: Right Lung';
-OutputFileNameStub = 'Unfiltered-PBF-Right';
-pft_CreateOneHistogram(s.UnfilteredAllPBF, RightBinaryMask, ProcessedMask, Slope, Intercept, 1000.0, NMax, 200, 'b', XLabel, YLabel, Title, HistogramFolder, OutputFileNameStub);
+  Title = 'Unfiltered PBF: Right Lung';
+  OutputFileNameStub = 'Unfiltered-PBF-Right';
+  pft_CreateOneHistogram(s.UnfilteredAllPBF, RightBinaryMask, ProcessedMask, Slope, Intercept, 1000.0, NMax, 200, 'b', XLabel, YLabel, Title, HistogramFolder, OutputFileNameStub);
 
-Title = 'Unfiltered PBF: Left Lung';
-OutputFileNameStub = 'Unfiltered-PBF-Left';
-pft_CreateOneHistogram(s.UnfilteredAllPBF, LinksBinaryMask, ProcessedMask, Slope, Intercept, 1000.0, NMax, 200, 'r', XLabel, YLabel, Title, HistogramFolder, OutputFileNameStub);
+  Title = 'Unfiltered PBF: Left Lung';
+  OutputFileNameStub = 'Unfiltered-PBF-Left';
+  pft_CreateOneHistogram(s.UnfilteredAllPBF, LinksBinaryMask, ProcessedMask, Slope, Intercept, 1000.0, NMax, 200, 'r', XLabel, YLabel, Title, HistogramFolder, OutputFileNameStub);
 
-Title = 'Unfiltered PBF: Both Lungs';
-OutputFileNameStub = 'Unfiltered-PBF-Total';
-pft_CreateOneHistogram(s.UnfilteredAllPBF, TotalBinaryMask, ProcessedMask, Slope, Intercept, 1000.0, NMax, 200, 'm', XLabel, YLabel, Title, HistogramFolder, OutputFileNameStub);
+  Title = 'Unfiltered PBF: Both Lungs';
+  OutputFileNameStub = 'Unfiltered-PBF-Total';
+  pft_CreateOneHistogram(s.UnfilteredAllPBF, TotalBinaryMask, ProcessedMask, Slope, Intercept, 1000.0, NMax, 200, 'm', XLabel, YLabel, Title, HistogramFolder, OutputFileNameStub);
 
-Eins = fullfile(HistogramFolder, 'Unfiltered-PBF-Right.pdf');
-Zwei = fullfile(HistogramFolder, 'Unfiltered-PBF-Left.pdf');
-Drei = fullfile(HistogramFolder, 'Unfiltered-PBF-Total.pdf');
+  Eins = fullfile(HistogramFolder, 'Unfiltered-PBF-Right.pdf');
+  Zwei = fullfile(HistogramFolder, 'Unfiltered-PBF-Left.pdf');
+  Drei = fullfile(HistogramFolder, 'Unfiltered-PBF-Total.pdf');
 
-Vier = fullfile(HistogramFolder, 'Unfiltered-PBF-Histograms.pdf');
+  Vier = fullfile(HistogramFolder, 'Unfiltered-PBF-Histograms.pdf');
 
-if (exist(Vier, 'file') == 2)
-  delete(Vier);
+  if (exist(Vier, 'file') == 2)
+    delete(Vier);
+    pause(1.0);
+  end
+
+  copyfile(Eins, Vier);
   pause(1.0);
+
+  append_pdfs(Vier, Zwei, Drei);
 end
-
-copyfile(Eins, Vier);
-pause(1.0);
-
-append_pdfs(Vier, Zwei, Drei);
 
 %% Create 3 histograms together with a common y-limit for the MTT
 
@@ -326,6 +334,58 @@ pause(1.0);
 
 append_pdfs(Vier, Zwei, Drei);
 
+%% Create 3 histograms together with a common y-limit for the unfilteredd MTT - if it exists
+
+if any(strcmpi(FieldNames, 'UnfilteredAllMTT'))
+  Slope	    = 0.001;
+  Intercept = - 10.0;
+
+  Edges = 0.1*(0:200)';
+
+  mtt = Intercept + Slope*double(s.UnfilteredAllMTT(RightBinaryMask & ProcessedMask));
+  [ NRight, Edges ] = histcounts(mtt, Edges);
+
+  mtt = Intercept + Slope*double(s.UnfilteredAllMTT(LinksBinaryMask & ProcessedMask));
+  [ NLinks, Edges ] = histcounts(mtt, Edges);
+
+  mtt = Intercept + Slope*double(s.UnfilteredAllMTT(TotalBinaryMask & ProcessedMask));
+  [ NTotal, Edges ] = histcounts(mtt, Edges);
+
+  NMax = max([max(NRight), max(NLinks), max(NTotal)]);
+  NMax = 5000.0*ceil(double(NMax)/5000.0);
+
+  XLabel = 'Unfiltered MTT [sec]';
+  YLabel = 'Voxel Count';
+
+  Title = 'Unfiltered MTT: Right Lung';
+  OutputFileNameStub = 'Unfiltered-MTT-Right';
+  pft_CreateOneHistogram(s.UnfilteredAllMTT, RightBinaryMask, ProcessedMask, Slope, Intercept, 20.0, NMax, 200, 'b', XLabel, YLabel, Title, HistogramFolder, OutputFileNameStub);
+
+  Title = 'Unfiltered MTT: Left Lung';
+  OutputFileNameStub = 'Unfiltered-MTT-Left';
+  pft_CreateOneHistogram(s.UnfilteredAllMTT, LinksBinaryMask, ProcessedMask, Slope, Intercept, 20.0, NMax, 200, 'r', XLabel, YLabel, Title, HistogramFolder, OutputFileNameStub);
+
+  Title = 'Unfiltered MTT: Both Lungs';
+  OutputFileNameStub = 'Unfiltered-MTT-Total';
+  pft_CreateOneHistogram(s.UnfilteredAllMTT, TotalBinaryMask, ProcessedMask, Slope, Intercept, 20.0, NMax, 200, 'm', XLabel, YLabel, Title, HistogramFolder, OutputFileNameStub);
+
+  Eins = fullfile(HistogramFolder, 'Unfiltered-MTT-Right.pdf');
+  Zwei = fullfile(HistogramFolder, 'Unfiltered-MTT-Left.pdf');
+  Drei = fullfile(HistogramFolder, 'Unfiltered-MTT-Total.pdf');
+
+  Vier = fullfile(HistogramFolder, 'Unfiltered-MTT-Histograms.pdf');
+
+  if (exist(Vier, 'file') == 2)
+    delete(Vier);
+    pause(1.0);
+  end
+
+  copyfile(Eins, Vier);
+  pause(1.0);
+
+  append_pdfs(Vier, Zwei, Drei);
+end
+
 %% Create 3 histograms together with a common y-limit for the TTP
 
 Slope	  = 0.001;
@@ -376,14 +436,15 @@ pause(1.0);
 
 append_pdfs(Vier, Zwei, Drei);
 
-%% Combine the 6 summary PDF files into one compilation
+%% Combine the summary PDF files into one compilation
 
 A = fullfile(HistogramFolder, 'PBV-Histograms.pdf');
 B = fullfile(HistogramFolder, 'Unfiltered-PBV-Histograms.pdf');
 C = fullfile(HistogramFolder, 'PBF-Histograms.pdf');
 D = fullfile(HistogramFolder, 'Unfiltered-PBF-Histograms.pdf');
 E = fullfile(HistogramFolder, 'MTT-Histograms.pdf');
-F = fullfile(HistogramFolder, 'TTP-Histograms.pdf');
+F = fullfile(HistogramFolder, 'Unfiltered-MTT-Histograms.pdf');
+G = fullfile(HistogramFolder, 'TTP-Histograms.pdf');
 
 X = fullfile(HistogramFolder, 'All-Histograms.pdf');
 
@@ -393,9 +454,26 @@ if (exist(X, 'file') == 2)
 end
 
 copyfile(A, X);
-pause(1.0);
+pause(0.25);
 
-append_pdfs(X, B, C, D, E, F);
+append_pdfs(X, B, C);
+pause(0.25);
+
+if (exist(D, 'file') == 2)
+  append_pdfs(X, D);
+  pause(0.25);
+end
+
+append_pdfs(X, E);
+pause(0.25);
+
+if (exist(F, 'file') == 2)
+  append_pdfs(X, F);
+  pause(0.25);
+end
+
+append_pdfs(X, G);
+pause(0.25);
 
 Z = fullfile(HistogramFolder, sprintf('%s-All-Histograms.pdf', Leaf));
 

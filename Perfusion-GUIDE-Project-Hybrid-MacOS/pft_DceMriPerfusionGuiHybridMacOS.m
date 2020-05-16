@@ -297,7 +297,7 @@ handles.Filter  = pft_GaussianFilter(handles.LastUsableFrame - 1, handles.Decade
 % Set the threshold to control the on-the-fly image masking
 handles.PC = 5.00;
 
-handles.InterpolationPrompt = 'Yes';
+handles.InterpolationPrompt = 'No';
 
 % Subtract the initial signal from the time-course by default
 handles.SubtractInitialSignal = true;

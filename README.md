@@ -261,4 +261,17 @@ For each workflow (Mark 1 Mapping, Ingrisch, Hybrid), there are two scripts; the
 
 As usual, the local TXT files need to be maintained to point to the appropriate folders on the user's local machine.
 
+## Segment Grayscale Images by Flood-Filling
+Lung cavities may be segmented by selecting a single seed-point with the mouse.
+A small suite of parameters controls the flood-filling operation.
+
+Run the function ```pft_DceMriPerfusionSegmentGrayscaleFloodFill.m```
+
+```This MATLAB GUIDE application was created with MATLAB 2017b, although this consideration is probably not critical.```
+
+## Segment Grayscale Images by Flood-Filling - MacOS Version
+Created to address possible problems with dual monitors on a MacOS system.
+
+Run the function ```pft_DceMriPerfusionSegmentGrayscaleFloodFillMacOS.m```
+
 ```This MATLAB GUIDE application was created with MATLAB 2017b, although this consideration is probably not critical.```

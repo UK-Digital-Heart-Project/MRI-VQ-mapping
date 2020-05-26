@@ -2251,6 +2251,3 @@ if (handles.AutoAdvanceSlice == true)
 end    
 
 end
-
-
-

@@ -275,3 +275,13 @@ Created to address possible problems with dual monitors on a MacOS system.
 Run the function ```pft_DceMriPerfusionSegmentGrayscaleFloodFillMacOS.m```
 
 ```This MATLAB GUIDE application was created with MATLAB 2017b, although this consideration is probably not critical.```
+
+## Combine Histograms Retrospectively
+Create a montage of the Right/Left/Total histograms of the segmented MTT, PBV, PBF and TTP.
+
+Two scripts are available, to create outputs in nutually trasnposed arrangements: ```pft_CreateHistogramMontage.m``` and ```pft_CreateHistogramMontageTransposed.m.```
+
+```These scripts created with MATLAB 2017b, although this consideration is probably not critical.```
+
+
+

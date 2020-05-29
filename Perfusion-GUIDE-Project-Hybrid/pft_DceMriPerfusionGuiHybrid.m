@@ -575,7 +575,7 @@ set(handles.hPlotDeconvolvedTimeCourse, 'YData', DummyY);
 % Update the slider and edit window for the Last Usable Frame
 set(handles.LastUsableFrameSlider, 'Enable', 'on');
 set(handles.LastUsableFrameSlider, 'Max', handles.NEPOCHS);
-set(handles.LastUsableFrameSlider, 'SliderStep', [1.0, 2.0]/double(handles.NEPOCHS - 5.0));
+set(handles.LastUsableFrameSlider, 'SliderStep', [1.0, 2.0]/double(handles.NEPOCHS - 4.0));
 
 if (handles.LastUsableFrame > handles.NEPOCHS)
   handles.LastUsableFrame = handles.NEPOCHS;

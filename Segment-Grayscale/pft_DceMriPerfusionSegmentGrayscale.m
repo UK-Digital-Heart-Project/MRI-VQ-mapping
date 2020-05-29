@@ -975,6 +975,20 @@ function MainFigure_DeleteFcn(hObject, eventdata, handles)
 % Re-enable a warning that was disabled on start-up
 warning('on', 'MATLAB:xlswrite:AddSheet');
 
+% Write out the Polygons pickle file
+PolygonsFile = fullfile(handles.RoiParentFolder, 'Polygons.mat');
+    
+if (exist(PolygonsFile, 'file') == 2)
+  delete(PolygonsFile);
+end
+    
+MRRP = handles.MostRecentRightPolygon;
+MRLP = handles.MostRecentLinksPolygon;
+LRPS = handles.LocalRightPolygons;
+LLPS = handles.LocalLinksPolygons;
+    
+save(PolygonsFile, 'MRRP', 'MRLP', 'LRPS', 'LLPS'); 
+
 % Now exit by deleting the figure
 delete(hObject);
 
@@ -987,7 +1001,24 @@ function MainFigure_KeyPressFcn(hObject, eventdata, handles)
 % Trap either of 2 conventional exit keys to turn off the warning that was turned off when the dialog opened
 switch eventdata.Key
   case { 'escape', 'return' }
+    % Write out the Polygons pickle file
+    PolygonsFile = fullfile(handles.RoiParentFolder, 'Polygons.mat');
+    
+    if (exist(PolygonsFile, 'file') == 2)
+      delete(PolygonsFile);
+    end
+    
+    MRRP = handles.MostRecentRightPolygon;
+    MRLP = handles.MostRecentLinksPolygon;
+    LRPS = handles.LocalRightPolygons;
+    LLPS = handles.LocalLinksPolygons;
+    
+    save(PolygonsFile, 'MRRP', 'MRLP', 'LRPS', 'LLPS'); 
+    
+    % Reinstate the XLSX warning
     warning('on', 'MATLAB:xlswrite:AddSheet');
+    
+    % Delete the figure
     delete(hObject);
   otherwise
     return;
@@ -1001,6 +1032,20 @@ function MainFigure_CloseRequestFcn(hObject, eventdata, handles)
 
 % Re-enable a warning that was disabled on start-up
 warning('on', 'MATLAB:xlswrite:AddSheet');
+
+% Write out the Polygons pickle file
+PolygonsFile = fullfile(handles.RoiParentFolder, 'Polygons.mat');
+    
+if (exist(PolygonsFile, 'file') == 2)
+  delete(PolygonsFile);
+end
+    
+MRRP = handles.MostRecentRightPolygon;
+MRLP = handles.MostRecentLinksPolygon;
+LRPS = handles.LocalRightPolygons;
+LLPS = handles.LocalLinksPolygons;
+    
+save(PolygonsFile, 'MRRP', 'MRLP', 'LRPS', 'LLPS');  
 
 % Now exit by deleting the figure
 delete(hObject);

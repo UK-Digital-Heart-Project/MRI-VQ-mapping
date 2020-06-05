@@ -1,6 +1,7 @@
 parula
 hsv
 hot
+hot-low-blue
 gray
 bone
 copper

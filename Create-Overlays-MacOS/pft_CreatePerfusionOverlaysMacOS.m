@@ -639,6 +639,9 @@ M = find(strcmpi(handles.MatlabLutNames, handles.CurrentColormapName), 1, 'first
 if ~isempty(M)
   if strcmpi(handles.CurrentColormapName, 'vga')
     handles.Colormap = vga; 
+  elseif strcmpi(handles.CurrentColormapName, 'hot-low-blue')
+    handles.Colormap = eval(sprintf('%s(%s)', 'hot', handles.CurrentColormapSize));
+    handles.Colormap(1, :) = [ 0.00 0.25 1.00 ];    
   else
     handles.Colormap = eval(sprintf('%s(%s)', handles.CurrentColormapName, handles.CurrentColormapSize));
   end
@@ -680,6 +683,9 @@ M = find(strcmpi(handles.MatlabLutNames, handles.CurrentColormapName), 1, 'first
 if ~isempty(M)
   if strcmpi(handles.CurrentColormapName, 'vga')
     handles.Colormap = vga; 
+  elseif strcmpi(handles.CurrentColormapName, 'hot-low-blue')
+    handles.Colormap = eval(sprintf('%s(%s)', 'hot', handles.CurrentColormapSize));
+    handles.Colormap(1, :) = [ 0.00 0.25 1.00 ];    
   else
     handles.Colormap = eval(sprintf('%s(%s)', handles.CurrentColormapName, handles.CurrentColormapSize));
   end

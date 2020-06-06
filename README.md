@@ -1,6 +1,19 @@
 # MRI VQ mapping
 Parametric mapping of MR lung perfusion and oxygen-enhanced imaging
 
+## Dependencies
+All of the following applications were written in ```MATLAB 2015aSP1``` or ```2017b```.
+In most cases, these versions are required to ensure that specific features of particular programs work correctly.
+
+At least the following toolboxes are needed (to run the software from the MATLAB IDE):
+
+- Signal Processing.
+- Image Processing.
+- Statistics and Machine Learning.
+
+For a more portable solution, the authors may be approached to create standalone executables of a particular script or GUI.
+Please specify the platform when making the request.
+
 ## Data Preparation
 MAT-format "pickle" files are created for each study.
 

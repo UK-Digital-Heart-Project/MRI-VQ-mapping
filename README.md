@@ -292,7 +292,7 @@ Run the function ```pft_DceMriPerfusionSegmentGrayscaleFloodFillMacOS.m```
 ## Combine Histograms Retrospectively
 Create a montage of the Right/Left/Total histograms of the segmented MTT, PBV, PBF and TTP.
 
-Two scripts are available, to create outputs in mutually trasnposed arrangements: ```pft_CreateHistogramMontage.m``` and ```pft_CreateHistogramMontageTransposed.m.```
+Two scripts are available, to create outputs in mutually transposed arrangements: ```pft_CreateHistogramMontage.m``` and ```pft_CreateHistogramMontageTransposed.m.```
 
 ```These scripts created with MATLAB 2017b, although this consideration is probably not critical.```
 

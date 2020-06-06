@@ -65,8 +65,9 @@ for n = 1:NFOLDERS
   Leaf = SubFolders{n}(r:end);
   
   p = strfind(Leaf, '_');
+  q = p(1);
   
-  PickleFileName = sprintf('%sTWIST.mat', Leaf(1:p));
+  PickleFileName = sprintf('%sTWIST.mat', Leaf(1:q));
   PicklePathName = fullfile(TopLevelFolder, PickleFileName);
   
   wb = waitbar(0.5, 'Saving pickle file - please wait ... ');

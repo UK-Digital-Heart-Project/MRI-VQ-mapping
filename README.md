@@ -2,7 +2,7 @@
 Parametric mapping of MR lung perfusion and oxygen-enhanced imaging
 
 ## Dependencies
-All of the following applications were written in ```MATLAB 2015aSP1``` or ```2017b```.
+All of the following applications were written in ```MATLAB 2015aSP1```, ```2017b``` or ```2020a```.
 In most cases, these versions are required to ensure that specific features of particular programs work correctly.
 
 At least the following toolboxes are needed (to run the software from the MATLAB IDE):
@@ -180,6 +180,25 @@ This GUI allows segmentation using the original grayscale cine-stacks.
 Quantitation using the manually drawn regions-of-interest and the previously calculated perfusion maps may then carried out using the separate Segmentation-Quantitation GUI.
 
 ```This GUI was created using MATLAB 2015aSP1, and may not work correctly with earlier or later versions.```
+
+## Segmentation from Grayscale Images - Freehand or Assisted
+Segmentation of the original grayscale images using either a freehand operation (one flowing movement of the mouse, trackpad or pen, or several mouse clicks), or an edge-detected tracing of a region boundary, with mouse clicks to define the waypoints.
+
+Regions of interest are overlaid (with controlled transparency) on the grayscale images, so that they can be visualised at different epochs.
+
+Regions can be created, modified or deleted.
+
+Segmentations can be read in from other applications - e.g., the flood-filling GUI - and modified here.
+
+Masks are written to the usual Left and Right Lung sub-folders. Region boundaries and waypoints are stored in ```Positions.mat```, and vertices in ```Polygons.mat```.
+
+```This GUI was created using MATLAB 2020a, and will not work correctly with versions much earlier than that.```
+
+## Segmentation from Grayscale Images - Freehand or Assisted - MacOS
+Created to accommodate a MacOS system with multiple monitors.
+The main dialog may be maximised to make all the controls visible.
+
+```This GUI was created using MATLAB 2020a, and will not work correctly with much earlier versions.```
 
 ## Mapping Histograms
 Histograms are generated from segmented maps.

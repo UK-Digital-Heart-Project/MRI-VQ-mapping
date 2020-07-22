@@ -315,7 +315,7 @@ Two scripts are available, to create outputs in mutually transposed arrangements
 
 ```These scripts created with MATLAB 2017b, although this consideration is probably not critical.```
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3871430.svg)](https://doi.org/10.5281/zenodo.3871430)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3956495.svg)](https://doi.org/10.5281/zenodo.3956495)
 
 
 
